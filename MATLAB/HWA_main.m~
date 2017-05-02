@@ -8,14 +8,8 @@
 clc, clear, close all
 
 load('highRE.mat') % Load high Re number data from LMS
-
 whos
 
-% highRE LMS variables
-U       = U    ; % Velocity at some z       (m/s)
-Uinf    = Uinf ; % Free stream velocity     (m/s)
-nu      = nu   ; % Kinematic viscosity      (mu/rho) = (m^2/s)
-uvar    = uvar ; % Variance of the signal U (-)
-x       = x    ; % Single numer == 21 ?     (m?)
-z       = z    ; % Z height                 (m)
-
+U       = U    ; % Velocity at some z
+Uinf    = Uinf ; % 
+nu
