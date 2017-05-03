@@ -32,10 +32,30 @@ figure ; hold on ;
 plot(u_pr_fitdat,V_pre_fit(u_pr_fitdat))  ;
 plot(u_po_fitdat,V_post_fit(u_po_fitdat)) ; hold off ;
 
-mu = 1.81e5;
-nu = mu/rho;
+%% Clauser plot input
 
-figure ; plot()
+% Intialise matrix of daqs
+ndaqs   = 30      ;
+ndaqpts = 30*30e3 ;
+data_full = zeros(ndaqs*ndaqpts,2);
+for i=1:ndaqs
+    filepath  = ['Data/',num2str(i),'.daq'];
+    data_temp = daqread(filepath);
+    strow     = (i-1)*(ndaqpts)+1;
+    endrow    = strow + ndaqpts-1;
+    data_full(strow:endrow,:) = data_temp ;
+end
+
+figure(plot())
+
+mu = 1.81e5 ;
+nu = mu/rho ;
+
+% U    = ?
+% Uinf = ?
+% log(y*U_inf/mu)
+
+figure ; plot(data_full(:,2),data_full(:,1))
 
 %% Load in the high reynolds data
 [U_hre,Uinf_hre,nu_hre,uvar_hre,x_hre,z_hre] = read_highRe();
@@ -46,4 +66,3 @@ rho = P/(R*T)     ; % Fluid density -> (kg/m^3)
 
 figure ; hold on ;
 plot(log((z_hre.*U_hre)/nu_hre) ,  U_hre./Uinf_hre)
-
