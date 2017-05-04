@@ -17,42 +17,29 @@ path_post = 'Data/post' ; % Post-calibration path
 [u_post,V_post,T_post,P_atm_post] = read_summary(path_post) ; % Post-calibration
 
 %% Define pre and post fits
-% Make a fit, fitType == 1 for kings law , == 2 for 3rd order poly
+% Make a fit, fitType == 1 for kings law , ==2 for 3rd order poly
 close all
+
+plotstho = 'nah'; % Plots the fitted curve vs orginal for yes, = 'yeahm8'
 fitType = 1     ; % 1 = Kings Law ; 2 = 3rd Order poly fit
 
-% Use fitting function to make a function for V(u)
-V_pr_fit = HWA_Calib_fitter(u_pre ,V_pre , 1) ;
-V_po_fit = HWA_Calib_fitter(u_post,V_post, 1) ;
+Vpr_fit  = HWA_Calib_fitter(u_pre, V_pre , 1,plotstho);
+V_po_fit = HWA_Calib_fitter(u_post,V_post, 1,plotstho);
 
-u_pr_fitdat = linspace(min(u_pre) , max(u_pre) , 1e2) ;
-u_po_fitdat = linspace(min(u_post), max(u_post), 1e2) ;
+u_pr_fitdat = linspace(min(u_pre) , max(u_pre) , 1e2);
+u_po_fitdat = linspace(min(u_post), max(u_post), 1e2);
 
-V_pr_fitdat = V_pr_fit(u_pr_fitdat) ;
-V_po_fitdat = V_po_fit(u_po_fitdat) ;
+figure ; hold on ; plot(Vpr_fit(u_pr_fitdat),u_pr_fitdat)  ;
+plot(V_pre,u_pre) ; title('Calibration plot, pre experiment data')
+xlabel('Velocity') ; ylabel('Voltage') ;
 
-% Plot of pre calibration, OG data with curve through points
-figure ; hold on ; plot(V_pr_fitdat,u_pr_fitdat)  ;
-plot(V_pre,u_pre,'o') ; title('Calibration plot, pre experiment data')
-xlabel('Voltage (V)') ; ylabel('Flow Speed (m/s)') ;
-legend('data-fit','original data') ;
+figure ; hold on ; plot(V_po_fit(u_po_fitdat),u_po_fitdat) ;
+plot(V_post,u_post) ; title('Calibration plot, post experiment data')
+xlabel('Velocity') ; ylabel('Voltage') ; legend('data-fit')
 
-% Plot of post calibration, OG data with curve through points
-figure ; hold on ; plot(V_pr_fitdat,u_po_fitdat) ;
-plot(V_post,u_post,'o') ; title('Calibration plot, post experiment data')
-xlabel('Voltage (V)') ; ylabel('Flow Speed (m/s)') ;
-legend('data-fit','original data') ;
+figure ; hold on ; plot(Vpr_fit(u_pr_fitdat),u_pr_fitdat)  ;
+plot(V_po_fit(u_po_fitdat),u_po_fitdat) ;
 
-% Plot the pre and post calibration signals on the same axes
-figure ; hold on ; plot(V_pr_fitdat,u_pr_fitdat)  ;
-plot(V_po_fitdat,u_po_fitdat) ; title('Fitted calibration curves')
-xlabel('Voltage (V)') ; ylabel('Flow Speed (m/s)') ;
-legend('pre-experiment','post-experiment') ;
-
-% for a fit at time 't' during the experiment
-t0 = 0  ; % Start time (mins)
-tf = 30 ; % End time   (mins)
-t_all = linspace(t0,tf,length(V_pr_fitdat));  % Time vector between start and end times
 %% Clauser plot input
 
 % Intialise matrix of daqs
