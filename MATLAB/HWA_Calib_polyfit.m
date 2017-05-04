@@ -10,23 +10,11 @@
 %
 % Inputs are : HWA_Calib_fitter(VELOCITY,VOLTAGE,fitType) 
 
-function V_handle = HWA_Calib_fitter(u,V,fitType) 
+function V_handle = HWA_Calib_polyfit(V,u) 
 
 % Make a custom fit
-[xd1,yd1] = prepareCurveData(u,V) ; % Prepare data, strips inf/nan/etc
+[xd1,yd1] = prepareCurveData(V,u) ; % Prepare data, strips inf/nan/etc
 opts = fitoptions( 'Method', 'NonlinearLeastSquares' );
+[V_handle, ~] = fit( xd1, yd1 , fittype( 'poly3') ,opts);
 
-% Specify fit type
-if fitType==1
-    ft = fittype( '( app + bpp*x^(1/n) )', 'independent', 'x', 'dependent', 'y' );
-    opts.startPoint = [-6,4,2] ;% First guess for fit co-efficients
-elseif fitType == 2
-    ft = fittype( 'poly3');
-%     opts.startPoint = [] ;% First guess for fit co-efficients
-else
-    fprintf('Wrong input')
-end
-
-% Make fits 
-[V_handle, ~] = fit( xd1, yd1 , ft ,opts)
 end

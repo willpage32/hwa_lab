@@ -19,11 +19,11 @@ path_post = 'Data/post' ; % Post-calibration path
 %% Define pre and post fits
 % Make a fit, fitType == 1 for kings law , == 2 for 3rd order poly
 close all
-fitType = 1     ; % 1 = Kings Law ; 2 = 3rd Order poly fit
+fitType = 2     ; % 1 = Kings Law ; 2 = 3rd Order poly fit
 
-% Use fitting function to make a function for V(u)
-V_pr_fit = HWA_Calib_fitter(u_pre ,V_pre , 1) ;
-V_po_fit = HWA_Calib_fitter(u_post,V_post, 1) ;
+%  Make a kings law / polyn fit 
+V_pr_fit = HWA_Calib_fitter(u_pre ,V_pre , fitType) ;
+V_po_fit = HWA_Calib_fitter(u_post,V_post, fitType) ;
 
 u_pr_fitdat = linspace(min(u_pre) , max(u_pre) , 1e2) ;
 u_po_fitdat = linspace(min(u_post), max(u_post), 1e2) ;
@@ -52,7 +52,38 @@ legend('pre-experiment','post-experiment') ;
 % for a fit at time 't' during the experiment
 t0 = 0  ; % Start time (mins)
 tf = 30 ; % End time   (mins)
-t_all = linspace(t0,tf,length(V_pr_fitdat));  % Time vector between start and end times
+time_start = t0*ones(length(V_pr_fitdat),1);
+time_end   = tf*ones(length(V_po_fitdat),1);
+
+V_fit = [V_pr_fitdat;V_po_fitdat]    ; % Voltage  fit functions
+u_fit = [u_pr_fitdat.';u_po_fitdat.']; % Velocity fit functions
+t_fit = [time_start;time_end]        ; % Time vector to match input curves
+
+%% Make a polyn fit 
+[xd1,yd1] = prepareCurveData(V_pre ,u_pre ) ; % Prepare data, strips inf/nan/etc
+[xd2,yd2] = prepareCurveData(V_post,u_post) ; % Prepare data, strips inf/nan/etc
+[V_prfit, ~] = fit(xd1, yd1, fittype('poly3')) ; % Create the  pre-fit
+[V_pofit, ~] = fit(xd2, yd2, fittype('poly3')) ; % Create the post-fit
+
+% Velocity fucntions describing some new 'u'
+u_pr = linspace(min(u_pre) ,max(u_pre) ,1e2).' ; 
+u_po = linspace(min(u_post),max(u_post),1e2).' ; 
+V_pr = V_prfit(u_pr) ; V_po = V_pofit(u_po)  ;  
+
+figure ; hold on ; plot(u_pr,V_pr) ; plot(u_po,V_po) ; title('Fitted calibration fns')
+onesies = ones(length(u_pr),1);
+t0 = 0 ; tf = 30 ; 
+t0s = t0*onesies ; tfs = tf*onesies ;
+
+% Define column vectors to create my surface function for U vs E
+u_fit = [u_pr;u_po];
+E_fit = [V_pr;V_po];
+t_fit = [t0s ; tfs];
+
+[xData, yData, zData] = prepareSurfaceData( E_fit, u_fit, t_fit );
+ft = fittype( 'poly22' );% Set up fittype and options.
+[fitresult, gof] = fit( [xData, yData], zData, ft );
+
 %% Clauser plot input
 
 % Intialise matrix of daqs

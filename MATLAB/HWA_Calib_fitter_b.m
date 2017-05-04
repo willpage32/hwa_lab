@@ -10,7 +10,7 @@
 %
 % Inputs are : HWA_Calib_fitter(VELOCITY,VOLTAGE,fitType) 
 
-function V_handle = HWA_Calib_fitter(u,V,fitType) 
+function V_handle = HWA_Calib_fitter_b(u,V,fitType) 
 
 % Make a custom fit
 [xd1,yd1] = prepareCurveData(u,V) ; % Prepare data, strips inf/nan/etc
