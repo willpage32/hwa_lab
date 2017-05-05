@@ -1,0 +1,44 @@
+% William Page (587000) - Kevin Rassool (540733)   ;
+% Semester 2 2017 - University of Melbourne        ; Started:     01/5/17
+% MCEN90018 - Advanced Fluid Dynamics              ; Last Edited: 19/5/17
+% Hot Wire Laboratory : Turbulent behaviours
+%
+% High Frequency Data Analysis Script
+
+clc, clear, close all   % Clear the MATLAB envirnoment
+
+ndaqs       = 30      ; % Number of data files (maybe 30 becuase 30 seconds?)
+ndaqpts     = 30*30e3 ; % Number of points in each .daq file
+data_full   = zeros(ndaqs*ndaqpts,2) ; % Intialise matrix of daqs
+
+for i=1:ndaqs % Read all high frequency data into one vector
+    filepath  = ['Data/',num2str(i),'.daq'] ; % File path for Daq file
+    data_temp = daqread(filepath) ; % Temporary variable for data
+    strow     = (i-1)*(ndaqpts)+1 ; % Starting row number for array 
+    endrow    = strow + ndaqpts-1 ; % Ending row number for array
+    data_full(strow:endrow,:) = data_temp ; % Complete data set
+end
+%%
+close all ;
+
+% Define experiment constants
+R       = 8.314459848       ; % Gas Const. -> ( kg m^(2) / ( s^2 K mol) )
+Temp    = 20 + 273.15       ; % Temp in degrees celcius -> (degC) 
+P_air   = 101325            ; % Ambient air pressure 
+rho = P_air/(R*Temp)        ; % Fluid density -> (kg/m^3)
+mu  = 1.81e5 ; nu = mu/rho  ; % Viscocities
+
+up2n = 200;
+clip_1 = data_full(1:up2n,1);
+clip_2 = data_full(1:up2n,2);
+
+figure ; hold on ; plot(clip_1) ; title('.daq file data, column 1, first 200 points') ;
+figure ; plot(clip_2) ;title('.daq file data, column 2,first 200 points') ;
+%  xlabel('Sample Number') ; ylabel('who knows') ;
+% legend('Row 1','Row 2')
+
+% U    = ?
+% Uinf = ?
+% log(y*U_inf/mu)
+
+
