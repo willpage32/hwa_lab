@@ -17,18 +17,20 @@ path_post = 'Data/post' ; % Post-calibration path
 [u_post,V_post,T_post,P_atm_post] = read_summary(path_post) ; % Post-calibration
 
 %% Make a polyn fit 
-[xd1,yd1] = prepareCurveData(V_pre ,u_pre ) ; % Prepare data, strips inf/nan/etc
-[xd2,yd2] = prepareCurveData(V_post,u_post) ; % Prepare data, strips inf/nan/etc
-[V_prfit, ~] = fit(xd1, yd1, fittype('poly3')) ; % Create the  pre-fit
-[V_pofit, ~] = fit(xd2, yd2, fittype('poly3')) ; % Create the post-fit
+[xd1,yd1] = prepareCurveData(V_pre , u_pre ) ; % Prepare data, strips inf/nan/etc
+[xd2,yd2] = prepareCurveData(V_post, u_post) ; % Prepare data, strips inf/nan/etc
+[u_prfit, Gpr] = fit(xd1, yd1, fittype('poly3')) ; % Create the  pre-fit
+[u_pofit, Gpo] = fit(xd2, yd2, fittype('poly3')) ; % Create the post-fit
 
 % Velocity fucntions describing some new 'u'
-u_pr = linspace(min(u_pre) ,max(u_pre) ,1e2).' ; 
-u_po = linspace(min(u_post),max(u_post),1e2).' ; 
-V_pr = V_prfit(u_pr) ; V_po = V_pofit(u_po)  ;  
+V_pr = linspace(min(u_pre) ,max(u_pre) ,1e2).' ; 
+V_po = linspace(min(u_post),max(u_post),1e2).' ; 
+
+u_pr = u_prfit(V_pr) ; u_po = u_pofit(V_po)  ;  
 
 figure ; hold on ; plot(u_pr,V_pr) ; plot(u_po,V_po) ; title('Fitted calibration fns')
-onesies = ones(length(u_pr),1);
+legend('Pre-experiment calibration','Post-experiment calibration')
+onesies = ones(length(V_pr),1);
 t0 = 0 ; tf = 30 ; 
 t0s = t0*onesies ; tfs = tf*onesies ;
 
