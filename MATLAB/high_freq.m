@@ -35,12 +35,13 @@ clip_1 = data_full(1:up2n,1) ; % First  row of clipped data
 clip_2 = data_full(1:up2n,2) ; % Second row of clipped data
 
 figure ; plot(clip_1) ; 
-title('.daq file data, column 1, (HWA Voltage I think?') ;
+title('.daq file data, column 1, (HWA Voltage I think?)') ;
 xlabel('Time (1/30000 s)') ; ylabel('Voltage (V)') ;
 
 figure ; plot(clip_2) ;
 title('.daq file data, column 2,first 200 points') ;
 xlabel('Time (1/30000 s)') ; ylabel('Dynamic pressure') ;
+
 %  xlabel('Sample Number') ; ylabel('who knows') ;
 % legend('Row 1','Row 2')
 
