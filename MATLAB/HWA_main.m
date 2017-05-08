@@ -57,7 +57,8 @@ title('Time linear interpolated U vs E correltation surface inputs')
 [U_hre,Uinf_hre,nu_hre,uvar_hre,x_hre,z_hre] = read_highRe();
 
 figure ; plot(log((z_hre.*U_hre)/nu_hre) ,  U_hre./Uinf_hre)
-title('Clauser plot, high re data')
+title('Clauser plot, high re data') ;
+xlabel('log()') ; ylabel('') ;
 
 % Read in the esummary data
 path_data = 'Data/';
