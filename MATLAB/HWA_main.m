@@ -85,7 +85,7 @@ logx_clau = log(clauser_x);
 figure ; plot(logx_clau,clauser_y) ; title('experimental Clauser plot') ; 
 ylabel('U^{+}') ; xlabel('y^{+}') ; hold on ;
 
-Cf = linspace(0,.5,1e2) ; %.4545  ;
+% Cf = linspace(0,.5,1e2) ; %.4545  ;
 Cf = .4545  ;
 clauser_x2 =(1/k) * sqrt(Cf/2).*log(y.*u_inf/nu_air)  + ...
         (1/k).*sqrt(Cf/2).*log(sqrt(Cf/2)) + A * sqrt(Cf/2) ;
@@ -113,27 +113,34 @@ grad_th=rise./run_th;
 grad_ex=rise./run_ex;
 
 grad_diff=grad_th-grad_ex;
-figure;
-hold on
-plot(Cf,grad_diff,'*')
-plot(Cf,zeros(size(Cf)));
+% figure;
+% hold on
+% plot(Cf,grad_diff,'*')
+% plot(Cf,zeros(size(Cf)));
 
-% set(gca,'xscale','log')
 % once Cf is found out, we can calculate tau_w and then U_tau
 tau_w = Cf.*(1/2).*rho.*(u_inf.^2) ;
 U_tau = sqrt(tau_w./rho) ;
 
 %% Determine true wall location
 
-xcorr(
+% c = normxcorr2([clauser_x;clauser_y],[clauser_x2;clauser_y]) 
+% figure ; plot(c) ;
+% 
+% [ypeak, xpeak]   = find(c==max(c(:)));
+% yoffSet = ypeak-size([clauser_x;clauser_y],1) % account for padding that normxcorr2 adds
+% 
+% shift=yoffSet;
+figure ; hold on ;
+plot(log(clauser_x),clauser_y,'b','lineWidth',2)     ; 
+plot(clauser_x2,clauser_y,'k','lineWidth',2)    ;
+
+for shift = [100 10 1 0.1 0.01 0.001]
+    y_new = (z_exp+shift)./1000 ;
+    clauser_x_new = (y_new.*u_hotwire)./(nu_air)   ; % Clauser x input shifted with y
+    plot(log(clauser_x_new),clauser_y) ; 
+    pause
+end
 
 
-
-shift=0;
-y_new = (z_exp./1000)+shift; % Distance from wall (m) (assumed
-clauser_x_new = (y_new.*u_hotwire)./(nu_air)   ; % Clauser x input shifted with y
-
-
-
-
-
+legend('OG ex','theory','ex shifted')
