@@ -72,16 +72,15 @@ T       = 20 + 273.15       ; % Temp in degrees celcius -> (degC)
 rho_hre = P_exp/(R*T_exp)   ; % Fluid density -> (kg/m^3)
 nu_air  = 15.11e-6          ; % Dynamic viscoity ( m^2 / s) 
 %% Experimental clauser inputs 
+close all
 
 u_data    = U_fnof_tnE((1:tf).',v_exp);
-clasuer_x = log(((z_exp./1000).*u_data)./(nu_air) ) ; % Clauser x input
+clauser_x = ((z_exp./1000).*u_data)./(nu_air) ; % Clauser x input
 u_exp_inf = u_exp;
-clauser_y = u_data/u_exp_inf;
+clauser_y = u_data./u_exp_inf ;
 
-figure ; plot(clauser_y) ; title('y input for clauser plot')
 
-figure; plot(u_exp) ; title('Averaged u velocity') ; 
-xlabel('Currently n (-) should be distance (m)') ; ylabel('U/U_{\inf} (-)')
+% xlabel('Currently n (-) should be distance (m)') ; ylabel('U/U_{\inf} (-)')
 
-figure ; (clasuer_x,clasuer_y)
+figure ; semilogx(clauser_x,clauser_y) title('Averaged u velocity') ; 
 %% Use of the clauser plot 
