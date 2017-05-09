@@ -58,29 +58,47 @@ title('Time linear interpolated U vs E correltation surface inputs')
 
 figure ; plot(log((z_hre.*U_hre)/nu_hre) ,  U_hre./Uinf_hre)
 title('Clauser plot, high re data') ;
-% xlabel('log()') ; ylabel('') ;
 
 % Read in the esummary data
 path_data = 'Data/';
 [u_exp,v_exp,T_exp,T2_exp,P_exp,z_exp,f_exp] = read_summary_d(path_data);
 
 % Experimental constants 
-K       = 0.4               ; % Von karman constant
+k       = 0.4               ; % Von karman constant
 A       = 5.0               ; % Clauser plot constant
-R       = 8.314459848       ; % Gas Const. -> ( kg m^(2) / ( s^2 K mol) )
-T       = 20 + 273.15       ; % Temp in degrees celcius -> (degC) 
-rho_hre = P_exp/(R*T_exp)   ; % Fluid density -> (kg/m^3)
+R       = 286.9             ; % Individual Gas Const. -> ( J/ (kg K) )
+T       = 20 + 273.15       ; % Temp in degrees Kelvin ()  
+rho     = P_exp/(R*T)       ; % Fluid density -> (kg/m^3)
 nu_air  = 15.11e-6          ; % Dynamic viscoity ( m^2 / s) 
 %% Experimental clauser inputs 
 close all
 
-u_data    = U_fnof_tnE((1:tf).',v_exp);
-clauser_x = ((z_exp./1000).*u_data)./(nu_air) ; % Clauser x input
-u_exp_inf = u_exp;
-clauser_y = u_data./u_exp_inf ;
+y = (z_exp./1000); % Distance from wall (m) (assumed
+
+u_hotwire = U_fnof_tnE((1:tf).',v_exp) ;
+clauser_x = (y.*u_hotwire)./(nu_air)   ; % Clauser x input
+u_inf     = u_exp ;
+clauser_y = u_hotwire./u_inf ;
+
+logxc = log(clauser_x);
+
+figure ; plot(logxc,clauser_y) ; title('experimental Clauser plot') ; 
+ylabel('U^{+}') ; xlabel('y^{+}') ; hold on ;
+
+Cf = .3741  ;
+clauser_x2 =(1/k) * sqrt(Cf/2)*log(y.*u_inf/nu_air)  + ...
+        (1/k)*sqrt(Cf/2)*log(sqrt(Cf/2)) + A * sqrt(Cf/2) ;
+plot(clauser_x2,clauser_y); 
 
 
-% xlabel('Currently n (-) should be distance (m)') ; ylabel('U/U_{\inf} (-)')
+rise  = 0.9-0.8 ;
+findx = find()
+run  = 
 
-figure ; semilogx(clauser_x,clauser_y) title('Averaged u velocity') ; 
-%% Use of the clauser plot 
+grad_experi =rise 
+grad_theory = 
+
+% set(gca,'xscale','log')
+% once Cf is found out, we can calculate tau_w and then U_tau
+tau_w = Cf*(1/2)*rho*(u_inf.^2) ;
+U_tau = sqrt(tau_w/rho) ;

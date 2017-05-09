@@ -90,9 +90,18 @@ clauser_x2 =(1/k) * sqrt(Cf/2)*log(y.*u_inf/nu_air)  + ...
         (1/k)*sqrt(Cf/2)*log(sqrt(Cf/2)) + A * sqrt(Cf/2) ;
 plot(clauser_x2,clauser_y); 
 
-% rise =
-% run  = 
-% grad_experi =rise 
+lin_u  = 0.9;
+lin_l  = 0.8;
+rise   = lin_u-lin_l ;
+
+findruy = find(clauser_y==lin_u)
+findru  = clauser_x(findruy)
+
+findrly = find(clauser_y==lin_l)
+findrl  = clauser_x(findrly)
+run     = findru - findrl
+
+grad_experi = rise/run 
 % grad_theory = 
 
 % set(gca,'xscale','log')
