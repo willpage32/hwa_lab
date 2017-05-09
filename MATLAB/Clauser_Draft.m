@@ -12,7 +12,7 @@ A=5;
 %properties of air
 ro=1.205        %kg/m^3 density
 mu=15.11e-6     %m^2/s  kinematic viscosity
-
+ 
 RHS=(1/k)*sqrt(Cf/2)*log(y.*U1/mu)  + ...
     (1/k)*sqrt(Cf/2)*log(sqrt(Cf/2) + ...
     A * sqrt(Cf/2)

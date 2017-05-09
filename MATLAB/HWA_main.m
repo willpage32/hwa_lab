@@ -80,31 +80,60 @@ clauser_x = (y.*u_hotwire)./(nu_air)   ; % Clauser x input
 u_inf     = u_exp ;
 clauser_y = u_hotwire./u_inf ;
 
-logxc = log(clauser_x);
+logx_clau = log(clauser_x);
 
-figure ; plot(logxc,clauser_y) ; title('experimental Clauser plot') ; 
+figure ; plot(logx_clau,clauser_y) ; title('experimental Clauser plot') ; 
 ylabel('U^{+}') ; xlabel('y^{+}') ; hold on ;
 
-Cf = .3741  ;
-clauser_x2 =(1/k) * sqrt(Cf/2)*log(y.*u_inf/nu_air)  + ...
-        (1/k)*sqrt(Cf/2)*log(sqrt(Cf/2)) + A * sqrt(Cf/2) ;
+Cf = linspace(0,.5,1e2) ; %.4545  ;
+Cf = .4545  ;
+clauser_x2 =(1/k) * sqrt(Cf/2).*log(y.*u_inf/nu_air)  + ...
+        (1/k).*sqrt(Cf/2).*log(sqrt(Cf/2)) + A * sqrt(Cf/2) ;
 plot(clauser_x2,clauser_y); 
 
-lin_u  = 0.9;
-lin_l  = 0.8;
-rise   = lin_u-lin_l ;
+%% find the gradients of each 
 
-findruy = find(clauser_y==lin_u)
-findru  = clauser_x(findruy)
+data_p_u=21;
+data_p_l=16;
 
-findrly = find(clauser_y==lin_l)
-findrl  = clauser_x(findrly)
-run     = findru - findrl
+x_th_1=clauser_x2(data_p_l,:);
+x_th_2=clauser_x2(data_p_u,:);
 
-grad_experi = rise/run 
-% grad_theory = 
+y_th_1=clauser_y(data_p_l);
+y_th_2=clauser_y(data_p_u);
+
+x_ex_1=logx_clau(data_p_l);
+x_ex_2=logx_clau(data_p_u);
+
+rise=y_th_2-y_th_1;
+run_th=x_th_2-x_th_1;
+run_ex=x_ex_2-x_ex_1;
+
+grad_th=rise./run_th;
+grad_ex=rise./run_ex;
+
+grad_diff=grad_th-grad_ex;
+figure;
+hold on
+plot(Cf,grad_diff,'*')
+plot(Cf,zeros(size(Cf)));
 
 % set(gca,'xscale','log')
 % once Cf is found out, we can calculate tau_w and then U_tau
-tau_w = Cf*(1/2)*rho*(u_inf.^2) ;
-U_tau = sqrt(tau_w/rho) ;
+tau_w = Cf.*(1/2).*rho.*(u_inf.^2) ;
+U_tau = sqrt(tau_w./rho) ;
+
+%% Determine true wall location
+
+xcorr(
+
+
+
+shift=0;
+y_new = (z_exp./1000)+shift; % Distance from wall (m) (assumed
+clauser_x_new = (y_new.*u_hotwire)./(nu_air)   ; % Clauser x input shifted with y
+
+
+
+
+
