@@ -31,10 +31,10 @@ mu  = 1.81e5 ; nu = mu/rho  ; % Viscocities
 freq = 30e3 ; % Data sampling frequency (for HWA!, not dyn pressure)
 dt   = .01  ; % Time up to take the data 
 N    = freq*dt ; % Number of elements to pull out of the arrays
-% t_st = 1       ; % Start time to take samples from
+t_st = 1       ; % Start time to take samples from
 % t_f  = s_st+N*10;
 
-dr   = 1:N ; % Data range to take form master array
+dr   = t_st*freq:t_st*freq+N ; % Data range to take form master array
 
 clip_1 = data_full(dr,1) ; % First  row of clipped data
 clip_2 = data_full(dr,2) ; % Second row of clipped data
@@ -49,14 +49,10 @@ title('.daq file data, column 2,first 200 points') ;
 xlabel('Time (1/30000 s)') ; ylabel('Dynamic pressure') ;
 
 figure ; 
-for pv = 1:100
-    st      = pv*N;
-    endr    = st+N;
-    clip_r  = st:endr;
-    
-    plot(data_full(clip_r))
-    axis([0,300,.51,.55]);
-    pause
+for pv = 1:10
+    st = t_
+    clip_r = pv*
+    plot(data_full())
 end
 
 %% Energy spectra analysis
