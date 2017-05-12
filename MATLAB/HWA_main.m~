@@ -120,6 +120,7 @@ plot(Cf,zeros(size(Cf)));
 % once Cf is found out, we can calculate tau_w and then U_tau
 tau_w = Cf.*(1/2).*rho.*(u_inf.^2) ;
 U_tau = sqrt(tau_w./rho) ;
+U_tau2=U_inf/(sqrt(2/Cf))
 
 %% Determine true wall location
 
