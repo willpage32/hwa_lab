@@ -82,14 +82,13 @@ clauser_y = u_hotwire./u_inf ;
 
 logx_clau = log(clauser_x);
 
-figure ; plot(logx_clau,clauser_y) ; title('experimental Clauser plot') ; 
-ylabel('U^{+}') ; xlabel('y^{+}') ; hold on ;
-
+%figure ; plot(logx_clau,clauser_y) ; title('experimental Clauser plot') ; 
+%ylabel('U^{+}') ; xlabel('y^{+}') ;
 % Cf = linspace(0,.5,1e2) ; %.4545  ;
 Cf = .4545  ;
 clauser_x2 =(1/k) * sqrt(Cf/2).*log(y.*u_inf/nu_air)  + ...
         (1/k).*sqrt(Cf/2).*log(sqrt(Cf/2)) + A * sqrt(Cf/2) ;
-plot(clauser_x2,clauser_y); 
+% plot(clauser_x2,clauser_y); 
 
 %% find the gradients of each 
 
@@ -131,16 +130,29 @@ U_tau = sqrt(tau_w./rho) ;
 % yoffSet = ypeak-size([clauser_x;clauser_y],1) % account for padding that normxcorr2 adds
 % 
 % shift=yoffSet;
-figure ; hold on ;
-plot(log(clauser_x),clauser_y,'b','lineWidth',2)     ; 
-plot(clauser_x2,clauser_y,'k','lineWidth',2)    ;
+%semilogx(exp(clauser_x2),clauser_y,'k','lineWidth',2)    ;
 
-for shift = [100 10 1 0.1 0.01 0.001]
-    y_new = (z_exp+shift)./1000 ;
-    clauser_x_new = (y_new.*u_hotwire)./(nu_air)   ; % Clauser x input shifted with y
-    plot(log(clauser_x_new),clauser_y) ; 
-    pause
-end
-
+% for shift = [100 10 1 0.1 0.01 0.001]
+%     y_new = (z_exp+shift)./1000 ;
+%     clauser_x_new = (y_new.*u_hotwire)./(nu_air)   ; % Clauser x input shifted with y
+%     plot(log(clauser_x_new),clauser_y) ; 
+%     pause
+% end
 
 legend('OG ex','theory','ex shifted')
+
+wall_pos=1;
+x_th_wall=clauser_x2(wall_pos)
+x_ex_wall=logx_clau(wall_pos)
+
+shift=4.8053e-05*100
+
+    y_new = (z_exp)./1000 +shift;
+    clauser_x_new = (y_new.*u_hotwire)./(nu_air)   ; % Clauser x input shifted with y
+    
+    
+    figure ; hold on ;
+    semilogx(clauser_x_new,clauser_y) ; 
+    semilogx(clauser_x,clauser_y,'b','lineWidth',2)     ; 
+
+    
