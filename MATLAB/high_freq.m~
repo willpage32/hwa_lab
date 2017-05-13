@@ -9,15 +9,24 @@ clc, clear, close all   % Clear the MATLAB envirnoment
 
 ndaqs       = 30      ; % Number of data files (maybe 30 becuase 30 seconds?)
 ndaqpts     = 30*30e3 ; % Number of points in each .daq file
-data_full   = zeros(ndaqs*ndaqpts,2) ; % Intialise matrix of daqs
+% data_full   = zeros(ndaqs*ndaqpts,2) ; % Intialise matrix of daqs
+[time_full,volt_full] = deal(zeros(ndaqpts,ndaqs));
+
 
 for i=1:ndaqs % Read all high frequency data into one vector
     filepath  = ['Data/',num2str(i),'.daq'] ; % File path for Daq file
-    data_temp = daqread(filepath) ; % Temporary variable for data
-    strow     = (i-1)*(ndaqpts)+1 ; % Starting row number for array 
-    endrow    = strow + ndaqpts-1 ; % Ending row number for array
-    data_full(strow:endrow,:) = data_temp ; % Complete data set
+    [data_temp,time] = daqread(filepath) ; % Temporary variable for data
+    
+    time_full(:,i) = data_temp(:,1) ;
+    volt_full(:,i) = data_temp(:,2) ;  
+%     strow     = (i-1)*(ndaqpts)+1 ; % Starting row number for array 
+%     endrow    = strow + ndaqpts-1 ; % Ending row number for array
+%     data_full(strow:endrow,:) = data_temp ; % Complete data set
 end
+
+% save(time_full)
+figure ; plot()
+
 %%
 close all ;
 
@@ -31,10 +40,10 @@ mu  = 1.81e5 ; nu = mu/rho  ; % Viscocities
 freq = 30e3 ; % Data sampling frequency (for HWA!, not dyn pressure)
 dt   = .01  ; % Time up to take the data 
 N    = freq*dt ; % Number of elements to pull out of the arrays
-t_st = 1       ; % Start time to take samples from
+% t_st = 1       ; % Start time to take samples from
 % t_f  = s_st+N*10;
 
-dr   = t_st*freq:t_st*freq+N ; % Data range to take form master array
+dr   = 1:N ; % Data range to take form master array
 
 clip_1 = data_full(dr,1) ; % First  row of clipped data
 clip_2 = data_full(dr,2) ; % Second row of clipped data
@@ -49,10 +58,14 @@ title('.daq file data, column 2,first 200 points') ;
 xlabel('Time (1/30000 s)') ; ylabel('Dynamic pressure') ;
 
 figure ; 
-for pv = 1:10
-    st = t_
-    clip_r = pv*
-    plot(data_full())
+for pv = 1:100
+    st      = pv*N;
+    endr    = st+N;
+    clip_r  = st:endr;
+    
+    plot(data_full(clip_r))
+    axis([0,300,.51,.55]);
+    pause
 end
 
 %% Energy spectra analysis

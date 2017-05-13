@@ -9,15 +9,19 @@ clc, clear, close all   % Clear the MATLAB envirnoment
 
 ndaqs       = 30      ; % Number of data files (maybe 30 becuase 30 seconds?)
 ndaqpts     = 30*30e3 ; % Number of points in each .daq file
-data_full   = zeros(ndaqs*ndaqpts,2) ; % Intialise matrix of daqs
+% data_full   = zeros(ndaqs*ndaqpts,2) ; % Intialise matrix of daqs
+[time_full,volt_full] = deal(zeros(ndaqpts,ndaqs));
+
 
 for i=1:ndaqs % Read all high frequency data into one vector
     filepath  = ['Data/',num2str(i),'.daq'] ; % File path for Daq file
     [data_temp,time] = daqread(filepath) ; % Temporary variable for data
-    strow     = (i-1)*(ndaqpts)+1 ; % Starting row number for array 
-    endrow    = strow + ndaqpts-1 ; % Ending row number for array
-    data_full(strow:endrow,:) = data_temp ; % Complete data set
+    time_full(:,i) = data_temp(:,1) ; % Build the time data
+    volt_full(:,i) = data_temp(:,2) ; % Build the voltage data
 end
+%%
+save('time','times_full')
+save('volt','volts_full')
 %%
 close all ;
 
