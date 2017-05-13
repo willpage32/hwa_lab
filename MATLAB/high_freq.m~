@@ -16,17 +16,12 @@ ndaqpts     = 30*30e3 ; % Number of points in each .daq file
 for i=1:ndaqs % Read all high frequency data into one vector
     filepath  = ['Data/',num2str(i),'.daq'] ; % File path for Daq file
     [data_temp,time] = daqread(filepath) ; % Temporary variable for data
-    
-    time_full(:,i) = data_temp(:,1) ;
-    volt_full(:,i) = data_temp(:,2) ;  
-%     strow     = (i-1)*(ndaqpts)+1 ; % Starting row number for array 
-%     endrow    = strow + ndaqpts-1 ; % Ending row number for array
-%     data_full(strow:endrow,:) = data_temp ; % Complete data set
+    time_full(:,i) = data_temp(:,1) ; % Build the time data
+    volt_full(:,i) = data_temp(:,2) ; % Build the voltage data
 end
-
-% save(time_full)
-figure ; plot()
-
+%%
+save('timest','time_full');
+save('volts','volt_full');
 %%
 close all ;
 

@@ -20,8 +20,8 @@ for i=1:ndaqs % Read all high frequency data into one vector
     volt_full(:,i) = data_temp(:,2) ; % Build the voltage data
 end
 %%
-save('time','times_full')
-save('volt','volts_full')
+save('times','time_full');
+save('volts','volt_full');
 %%
 close all ;
 
