@@ -150,19 +150,23 @@ clauser_true =(1/k) * sqrt(Cf_true/2).*log(y.*u_inf/nu_air)  + ...
 %% Variance
 
 
- load('times.mat')
+%load('times.mat')
 load('volts.mat')
 
-
 voltage_variance=var(volt_full);
+U_var = U_fnof_tnE((1:tf).',voltage_variance') ;
 
+%% 
 figure; hold on
-plot(z_exp,voltage_variance)
-plot(z_exp,voltage_variance)
+plot(y,U_var)  % what units are zexp and zhre in?
+plot(z_hre,uvar_hre)
+xlabel('Distance From Wall [m]')
+ylabel('Variance')
 
-
+subplot
 
 %% Plotting
+
 
 %HIGH re
 figure ; semilogx((z_hre.*U_hre)/nu_hre ,  U_hre./Uinf_hre)

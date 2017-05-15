@@ -158,8 +158,21 @@ U_var = U_fnof_tnE((1:tf).',voltage_variance') ;
 
 %% 
 figure; hold on
-plot(z_exp,U_var)  % what units are zexp and zhre in?
+plot(y,U_var)  % what units are zexp and zhre in?
 plot(z_hre,uvar_hre)
+xlabel('Distance From Wall [m]')
+ylabel('Variance')
+
+figure;
+subplot(2,1,1)
+plot(y,U_var)  % what units are zexp and zhre in?
+ylabel('Variance')
+subplot(2,1,2)
+plot(z_hre,uvar_hre)
+ylabel('Variance')
+xlabel('Distance From Wall [m]')
+
+
 
 %% Plotting
 
