@@ -121,7 +121,7 @@ Cf_true=Cf(Cf_loc)
 
 %% Caluclate Tau and U_tau
 % once Cf is found out, we can calculate tau_w and then U_tau
-tau_w = Cf .*(1/2).*rho.*(u_inf.^2) ;
+tau_w = Cf_true .*(1/2).*rho.*(u_inf.^2) ;
 U_tau = sqrt(tau_w./rho) ;
 
 %% Define true Clauser plot
@@ -221,6 +221,6 @@ Cf_true;
 
 %% Qn6.7b, determine \nu/U_tau, Re_{\delta99}, Re_x, Re_{\tau}
 
-nu_air/U_tau
+nu_air./U_tau
 %Re_d99=
 
