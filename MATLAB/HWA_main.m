@@ -156,7 +156,7 @@ load('volts.mat')
 voltage_variance=var(volt_full);
 U_var = U_fnof_tnE((1:tf).',voltage_variance') ;
 
-%% 
+%%  Plot Variance
 figure; hold on
 plot(y,U_var)  % what units are zexp and zhre in?
 plot(z_hre,uvar_hre)
@@ -172,22 +172,61 @@ plot(z_hre,uvar_hre)
 ylabel('Variance')
 xlabel('Distance From Wall [m]')
 
-
-
-%% Plotting
-
+%% Plot Clauser Graphs
 
 %HIGH re
 figure ; semilogx((z_hre.*U_hre)/nu_hre ,  U_hre./Uinf_hre)
 title('Clauser plot, high re data') ;
-hold on
- ;
+legend('High Re')
+
+figure;
 semilogx(exp(clauser_true),clauser_y) ;
 hold on ;
-semilogx(exp(log(clauser_x)+3.3),clauser_y) ;
-legend('High Re','Clauser True','experimental')
+shift=3.3;
+semilogx(exp(log(clauser_x)+shift),clauser_y) ;
+legend('Clauser Theory','Experimental')
+% 
+% [acor,lag] =xcorr(clauser_true,log(clauser_x));
+% 
+% [acor,lag']
+
+%% Qn6.7a, determine \delta_{99}, \delta*, \theta , H , Cf
+%Determine for low Re (experimental data)
+%Delta 99 - Bpoundary Layer thickness
+vel_ratio=u_hotwire./u_inf;
+[e loc99]=min(abs(vel_ratio-.99));
+delta99=y(loc99)
+%show the velocity on a plot
+figure; hold on; xlabel('Distance from Wall [m]');ylabel('Velocity')
+plot(y,u_hotwire); plot(delta99,u_hotwire(loc99),'r*')
+legend('Hotwire Velocity','99% U_0'); 
+
+%Delta* - Displacement Thickness
+%uses trapz to integrate w.r.t y
+T1=(1-u_hotwire./u_inf);
+delta_star=trapz(y,T1);
+
+%\Theta - Momentum thickness
+T2=(u_hotwire./u_inf).*(1-u_hotwire./u_inf);
+Theta=trapz(y,T2);
+
+%H - Shape factor
+%The higher the value of H, the stronger the adverse pressure gradient. 
+%A high adverse pressure gradient can greatly reduce the Reynolds number at 
+%which transition into turbulence may occur.
+H=delta_star/Theta;
+
+%Skin Friction Coefficient
+Cf_true;
 
 
-[acor,lag] =xcorr(clauser_true,log(clauser_x));
 
-[acor,lag']
+
+
+
+
+%% Qn6.7b, determine \nu/U_tau, Re_{\delta99}, Re_x, Re_{\tau}
+
+nu_air/U_tau
+Re_d99=
+
