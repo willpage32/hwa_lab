@@ -149,7 +149,6 @@ clauser_true =(1/k) * sqrt(Cf_true/2).*log(y.*u_inf/nu_air)  + ...
 
 %% Variance
 
-
 %load('times.mat')
 load('volts.mat')
 
@@ -220,13 +219,8 @@ H=delta_star/Theta;
 Cf_true;
 
 
-
-
-
-
-
 %% Qn6.7b, determine \nu/U_tau, Re_{\delta99}, Re_x, Re_{\tau}
 
 nu_air/U_tau
-Re_d99=
+%Re_d99=
 
