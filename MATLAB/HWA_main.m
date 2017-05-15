@@ -33,6 +33,9 @@ legend('Pre-experiment calibration','Post-experiment calibration')
 onesies = ones(length(V_pr),1);
 t0 = 0 ; tf = 30 ; 
 t0s = t0*onesies ; tfs = tf*onesies ;
+%% Kings law
+
+
 
 %% Fit a surface to the data so we can evaluate at any time
 u_fit = [u_pr;u_po] ; E_fit = [V_pr;V_po] ; t_fit = [t0s ; tfs] ;
@@ -56,20 +59,18 @@ title('Time linear interpolated U vs E correltation surface inputs')
 %% Load in the high reynolds data
 [U_hre,Uinf_hre,nu_hre,uvar_hre,x_hre,z_hre] = read_highRe();
 
-figure ; plot(log((z_hre.*U_hre)/nu_hre) ,  U_hre./Uinf_hre)
-title('Clauser plot, high re data') ;
-
-% Read in the esummary data
+%% Read in the esummary data
 path_data = 'Data/';
 [u_exp,v_exp,T_exp,T2_exp,P_exp,z_exp,f_exp] = read_summary_d(path_data);
 
-% Experimental constants 
+%% Experimental constants 
 k       = 0.4               ; % Von karman constant
 A       = 5.0               ; % Clauser plot constant
 R       = 286.9             ; % Individual Gas Const. -> ( J/ (kg K) )
 T       = 20 + 273.15       ; % Temp in degrees Kelvin ()  
 rho     = P_exp/(R*T)       ; % Fluid density -> (kg/m^3)
 nu_air  = 15.11e-6          ; % Dynamic viscoity ( m^2 / s) 
+
 %% Experimental clauser inputs 
 close all
 
@@ -82,15 +83,11 @@ clauser_y = u_hotwire./u_inf ;
 
 logx_clau = log(clauser_x);
 
-%figure ; plot(logx_clau,clauser_y) ; title('experimental Clauser plot') ; 
-%ylabel('U^{+}') ; xlabel('y^{+}') ;
-% Cf = linspace(0,.5,1e2) ; %.4545  ;
-Cf = .4545  ;
+Cf = linspace(0,.5,5e2) ; %.4545  ;
 clauser_x2 =(1/k) * sqrt(Cf/2).*log(y.*u_inf/nu_air)  + ...
         (1/k).*sqrt(Cf/2).*log(sqrt(Cf/2)) + A * sqrt(Cf/2) ;
-% plot(clauser_x2,clauser_y); 
 
-%% find the gradients of each 
+%% find the gradients of clauser and experimental, find Cf
 
 data_p_u=21;
 data_p_l=16;
@@ -112,47 +109,56 @@ grad_th=rise./run_th;
 grad_ex=rise./run_ex;
 
 grad_diff=grad_th-grad_ex;
-figure;
-hold on
-plot(Cf,grad_diff,'*')
-plot(Cf,zeros(size(Cf)));
 
+% figure;
+% hold on
+% plot(Cf,grad_diff,'*')
+% plot(Cf,zeros(size(Cf)));
+
+[e Cf_loc]=min(abs(grad_diff));
+Cf_true=Cf(Cf_loc)
+
+%% Caluclate Tau and U_tau
 % once Cf is found out, we can calculate tau_w and then U_tau
-tau_w = Cf.*(1/2).*rho.*(u_inf.^2) ;
+tau_w = Cf .*(1/2).*rho.*(u_inf.^2) ;
 U_tau = sqrt(tau_w./rho) ;
+
+%% Define true Clauser plot
+
+clauser_true =(1/k) * sqrt(Cf_true/2).*log(y.*u_inf/nu_air)  + ...
+        (1/k).*sqrt(Cf_true/2).*log(sqrt(Cf_true/2)) + A * sqrt(Cf_true/2);
 
 %% Determine true wall location
 
-% c = normxcorr2([clauser_x;clauser_y],[clauser_x2;clauser_y]) 
-% figure ; plot(c) ;
+% legend('OG ex','theory','ex shifted')
 % 
-% [ypeak, xpeak]   = find(c==max(c(:)));
-% yoffSet = ypeak-size([clauser_x;clauser_y],1) % account for padding that normxcorr2 adds
+% wall_pos=1;
+% x_th_wall=clauser_x2(wall_pos)
+% x_ex_wall=logx_clau(wall_pos)
 % 
-% shift=yoffSet;
-%semilogx(exp(clauser_x2),clauser_y,'k','lineWidth',2)    ;
-
-% for shift = [100 10 1 0.1 0.01 0.001]
-%     y_new = (z_exp+shift)./1000 ;
+% shift=%4.8053e-05*100
+% 
+%     y_new = (z_exp)./1000 .*shift;
 %     clauser_x_new = (y_new.*u_hotwire)./(nu_air)   ; % Clauser x input shifted with y
-%     plot(log(clauser_x_new),clauser_y) ; 
-%     pause
-% end
+%     
+%     figure ;
+%     semilogx(clauser_x_new,clauser_y) ;
+%     hold on ;
+%     semilogx(clauser_x,clauser_y,'b','lineWidth',2)     ;
 
-legend('OG ex','theory','ex shifted')
+%% Plotting
 
-wall_pos=1;
-x_th_wall=clauser_x2(wall_pos)
-x_ex_wall=logx_clau(wall_pos)
+%HIGH re
+figure ; semilogx((z_hre.*U_hre)/nu_hre ,  U_hre./Uinf_hre)
+title('Clauser plot, high re data') ;
+hold on
+ ;
+semilogx(exp(clauser_true),clauser_y) ;
+hold on ;
+semilogx(exp(log(clauser_x)+3.3),clauser_y) ;
+legend('High Re','Clauser True','experimental')
 
-shift=4.8053e-05*100
 
-    y_new = (z_exp)./1000 +shift;
-    clauser_x_new = (y_new.*u_hotwire)./(nu_air)   ; % Clauser x input shifted with y
-    
-    
-    figure ; hold on ;
-    semilogx(clauser_x_new,clauser_y) ; 
-    semilogx(clauser_x,clauser_y,'b','lineWidth',2)     ; 
+[acor,lag] =xcorr(clauser_true,log(clauser_x));
 
-    
+[acor,lag']
