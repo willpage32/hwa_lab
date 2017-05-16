@@ -121,8 +121,8 @@ Cf_true=Cf(Cf_loc)
 
 %% Caluclate Tau and U_tau
 % once Cf is found out, we can calculate tau_w and then U_tau
-tau_w = Cf_true .*(1/2).*rho.*(u_inf.^2) ;
-U_tau = sqrt(tau_w./rho) ;
+tau_w = Cf_true .*(1/2).*rho.*(u_inf.^2) ;  %[Pa]  or  N/m^2 
+U_tau = sqrt(tau_w./rho) ;                  %[Pa]/[kg/m^3] = [m/s]
 
 %% Define true Clauser plot
 
@@ -189,9 +189,12 @@ legend('Clauser Theory','Experimental')
 % 
 % [acor,lag']
 
-%% Qn6.7a, determine \delta_{99}, \delta*, \theta , H , Cf
-%Determine for low Re (experimental data)
-%Delta 99 - Bpoundary Layer thickness
+%% Qn6.7a,  --------------------- %
+%determine \delta_{99}, \delta*, \theta , H , Cf
+%\nu/U_tau, Re_{\delta99}, Re_x, Re_{\tau}
+%     Determine for low Re (experimental data)     %
+
+%Delta 99 - Boundary Layer thickness
 vel_ratio=u_hotwire./u_inf;
 [e loc99]=min(abs(vel_ratio-.99));
 delta99=y(loc99)
@@ -218,9 +221,9 @@ H=delta_star/Theta;
 %Skin Friction Coefficient
 Cf_true;
 
+%% Qn6.7b, determine 
+nu_air./U_tau;
 
-%% Qn6.7b, determine \nu/U_tau, Re_{\delta99}, Re_x, Re_{\tau}
 
-nu_air./U_tau
-%Re_d99=
+% Re_d99=
 
