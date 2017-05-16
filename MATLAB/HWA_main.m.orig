@@ -232,10 +232,19 @@ semilogx(clauser_x,clauser_y)
 % 
 % [acor,lag']
 
+<<<<<<< HEAD
+%% Qn6.7a,  --------------------- %
+%determine \delta_{99}, \delta*, \theta , H , Cf
+%\nu/U_tau, Re_{\delta99}, Re_x, Re_{\tau}
+%     Determine for low Re (experimental data)     %
+
+%Delta 99 - Boundary Layer thickness
+=======
 %% Qn6.7a, determine \delta_{99}, \delta*, \theta , H , Cf
 %Determine for low Re (experimental data)
 
 %Delta 99 - Bpoundary Layer thickness
+>>>>>>> 6869be6b5ca942cc7d8ce888ee13bfa032c4ad6b
 vel_ratio=u_hotwire./u_inf;
 [e loc99]=min(abs(vel_ratio-.99));
 delta99=y(loc99)
@@ -267,8 +276,14 @@ Cf_true;
 nu_air./U_tau;
 
 
+<<<<<<< HEAD
+nu_air./U_tau
+<<<<<<< HEAD
+%Re_d99=
+=======
 %Re_d99=
 =======
 nu_air./U_tau
 %Re_d99=
+>>>>>>> 6869be6b5ca942cc7d8ce888ee13bfa032c4ad6b
 >>>>>>> b15967112c1f0455feab0b219bf694192c702ec5

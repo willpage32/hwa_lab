@@ -121,8 +121,8 @@ Cf_true=Cf(Cf_loc)
 
 %% Caluclate Tau and U_tau
 % once Cf is found out, we can calculate tau_w and then U_tau
-tau_w = Cf_true .*(1/2).*rho.*(u_inf.^2) ;  %[Pa]  or  N/m^2 
-U_tau = sqrt(tau_w./rho) ;                  %[Pa]/[kg/m^3] = [m/s]
+tau_w = Cf_true .*(1/2).*rho.*(u_inf.^2) ;
+U_tau = sqrt(tau_w./rho) ;
 
 %% Define true Clauser plot
 
@@ -196,16 +196,8 @@ logbit_yplus = (y(log_range).*u_hotwire(log_range))/ nu_air;
 
 [xData, yData] = prepareCurveData( logbit_yplus, logbit_uplus );
 ft = fittype( 'a + .1384*log(x)', 'independent', 'x', 'dependent', 'y' );
-[log_bit_fit, gof] = fit( xData, yData, ft );
-
-rng = linspace(.1,3e4,1e2);
-figure ; plot(clauser_x,clauser_y) ; hold on ;
-plot(rng,log_bit_fit(rng))
-
-figure ; semilogx(rng,log_bit_fit(rng)) ; hold on ;
-semilogx(clauser_x,clauser_y)
-
-% plot( log_bit_fit, xData, yData );
+[log_bit_fit, gof] = fit( xData, yData, ft);
+semi( fitresult, xData, yData );
 % semilogx(log_bit_fit())
 % syms const1
 % 
@@ -263,12 +255,8 @@ H=delta_star/Theta;
 %Skin Friction Coefficient
 Cf_true;
 
-%% Qn6.7b, determine 
-nu_air./U_tau;
 
+%% Qn6.7b, determine \nu/U_tau, Re_{\delta99}, Re_x, Re_{\tau}
 
-%Re_d99=
-=======
 nu_air./U_tau
 %Re_d99=
->>>>>>> b15967112c1f0455feab0b219bf694192c702ec5
