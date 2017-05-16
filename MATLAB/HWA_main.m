@@ -84,7 +84,7 @@ clauser_y = u_hotwire./u_inf ;
 
 logx_clau = log(clauser_x);
 
-Cf = linspace(0,.5,5e2) ; %.4545  ;
+Cf = .4545%  linspace(0,.5,5e2) ; %.4545  ;
 clauser_x2 =(1/k) * sqrt(Cf/2).*log(y.*u_inf/nu_air)  + ...
         (1/k).*sqrt(Cf/2).*log(sqrt(Cf/2)) + A * sqrt(Cf/2) ;
 
@@ -155,7 +155,7 @@ load('volts.mat')
 voltage_variance=var(volt_full);
 U_var = U_fnof_tnE((1:tf).',voltage_variance') ;
 
-%%  Plot Variance
+%%  Plot Variance QN3/4
 figure; hold on
 plot(y,U_var)  % what units are zexp and zhre in?
 plot(z_hre,uvar_hre)
@@ -171,7 +171,7 @@ plot(z_hre,uvar_hre)
 ylabel('Variance')
 xlabel('Distance From Wall [m]')
 
-%% Plot Clauser Graphs
+%% Plot Clauser Graphs 
 
 %HIGH re
 figure ; semilogx((z_hre.*U_hre)/nu_hre ,  U_hre./Uinf_hre)
@@ -184,6 +184,49 @@ hold on ;
 shift=3.3;
 semilogx(exp(log(clauser_x)+shift),clauser_y) ;
 legend('Clauser Theory','Experimental')
+xlabel('y+') ; ylabel('U+');
+
+% Find experimental constant 
+Uplus_known = u_hotwire(data_p_l) / u_inf(data_p_l)
+yplus_known = (y(data_p_l)*u_hotwire(data_p_l)) / ( 1e2*nu_air)
+
+log_range = data_p_l:data_p_u
+logbit_uplus = (u_hotwire(log_range)) ./ (u_inf(log_range));
+logbit_yplus = (y(log_range).*u_hotwire(log_range))/ nu_air;
+
+[xData, yData] = prepareCurveData( logbit_yplus, logbit_uplus );
+ft = fittype( 'a + .1384*log(x)', 'independent', 'x', 'dependent', 'y' );
+[log_bit_fit, gof] = fit( xData, yData, ft );
+
+rng = linspace(.1,3e4,1e2);
+figure ; plot(clauser_x,clauser_y) ; hold on ;
+plot(rng,log_bit_fit(rng))
+
+figure ; semilogx(rng,log_bit_fit(rng)) ; hold on ;
+semilogx(clauser_x,clauser_y)
+
+% plot( log_bit_fit, xData, yData );
+% semilogx(log_bit_fit())
+% syms const1
+% 
+% ayy = solve(Uplus_known==grad_ex*yplus_known + const1)
+% ayy = vpa(ayy,3)
+% 
+% fplot(@(yplus) .1384*log(yplus)+ayy ,[1e1,1e6])
+
+% x2u = u_hotwire(data_p_u)%=21;
+% x1u = u_hotwire(data_p_l)%=16;
+% 
+% x1 = log((y(data_p_l)*x1u)/nu_air); 
+% y1 = x1u ./ u_inf(data_p_l) ;
+% x2 = log((y(data_p_u)*x2u)/nu_air); 
+% y2 = x2u ./ u_inf(data_p_u);
+% 
+% [p,~,mu] = polyfit([x1, x2], [y1, y2], 1);
+% % a = coefficients(1);
+% % b = coefficients(2);
+% f = polyval(p,[0:.001:1],[],mu);
+% plot([0:.001:1],f)
 % 
 % [acor,lag] =xcorr(clauser_true,log(clauser_x));
 % 
@@ -191,10 +234,12 @@ legend('Clauser Theory','Experimental')
 
 %% Qn6.7a, determine \delta_{99}, \delta*, \theta , H , Cf
 %Determine for low Re (experimental data)
+
 %Delta 99 - Bpoundary Layer thickness
 vel_ratio=u_hotwire./u_inf;
 [e loc99]=min(abs(vel_ratio-.99));
 delta99=y(loc99)
+
 %show the velocity on a plot
 figure; hold on; xlabel('Distance from Wall [m]');ylabel('Velocity')
 plot(y,u_hotwire); plot(delta99,u_hotwire(loc99),'r*')
@@ -223,4 +268,3 @@ Cf_true;
 
 nu_air./U_tau
 %Re_d99=
-
