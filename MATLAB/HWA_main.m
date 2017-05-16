@@ -33,10 +33,6 @@ legend('Pre-experiment calibration','Post-experiment calibration')
 onesies = ones(length(V_pr),1);
 t0 = 0 ; tf = 30 ; 
 t0s = t0*onesies ; tfs = tf*onesies ;
-%% Kings law
-%Discuss kings law... qn 6.3
-%h=a+b+vf.^c;
-
 
 %% Fit a surface to the data so we can evaluate at any time
 u_fit = [u_pr;u_po] ; E_fit = [V_pr;V_po] ; t_fit = [t0s ; tfs] ;
@@ -128,24 +124,6 @@ U_tau = sqrt(tau_w./rho) ;                  %[Pa]/[kg/m^3] = [m/s]
 
 clauser_true =(1/k) * sqrt(Cf_true/2).*log(y.*u_inf/nu_air)  + ...
         (1/k).*sqrt(Cf_true/2).*log(sqrt(Cf_true/2)) + A * sqrt(Cf_true/2);
-
-%% Determine true wall location
-
-% legend('OG ex','theory','ex shifted')
-% 
-% wall_pos=1;
-% x_th_wall=clauser_x2(wall_pos)
-% x_ex_wall=logx_clau(wall_pos)
-% 
-% shift=%4.8053e-05*100
-% 
-%     y_new = (z_exp)./1000 .*shift;
-%     clauser_x_new = (y_new.*u_hotwire)./(nu_air)   ; % Clauser x input shifted with y
-%     
-%     figure ;
-%     semilogx(clauser_x_new,clauser_y) ;
-%     hold on ;
-%     semilogx(clauser_x,clauser_y,'b','lineWidth',2)     ;
 
 %% Variance
 
@@ -263,12 +241,34 @@ H=delta_star/Theta;
 %Skin Friction Coefficient
 Cf_true;
 
-%% Qn6.7b, determine 
-nu_air./U_tau;
-
-
-%Re_d99=
-=======
+%% Qn6.7b, determine for high Re data 
+%[U_hre,Uinf_hre,nu_hre,uvar_hre,x_hre,z_hre] = read_highRe();
 nu_air./U_tau
-%Re_d99=
->>>>>>> b15967112c1f0455feab0b219bf694192c702ec5
+
+%Delta 99 - Bpoundary Layer thickness
+vel_ratio_hre=U_hre./Uinf_hre;
+[e_hre loc99_hre]=min(abs(vel_ratio_hre-.99));
+delta99_hre=z_hre(loc99_hre)
+
+%show the velocity on a plot
+figure; hold on; xlabel('Distance from Wall [m]');ylabel('Velocity')
+plot(z_hre,U_hre); plot(delta99_hre,U_hre(loc99_hre),'r*')
+legend('Hotwire Velocity High Re','99% U_0'); 
+
+%Delta* - Displacement Thickness
+%uses trapz to integrate w.r.t y
+T1_hre=(1-U_hre./Uinf_hre);
+delta_star_hre=trapz(z_hre,T1_hre);
+
+%\Theta - Momentum thickness
+T2_hre=(U_hre./Uinf_hre).*(1-U_hre./Uinf_hre);
+Theta_hre=trapz(z_hre,T2_hre);
+
+%H - Shape factor
+%The higher the value of H, the stronger the adverse pressure gradient. 
+%A high adverse pressure gradient can greatly reduce the Reynolds number at 
+%which transition into turbulence may occur.
+H=delta_star_hre/Theta_hre;
+
+%Skin Friction Coefficient
+Cf_true;
