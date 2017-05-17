@@ -77,14 +77,14 @@ close all
 
 y = (z_exp./1000); % Distance from wall (m) (assumed
 
-u_hotwire = U_fnof_tnE((1:tf).',v_exp) ;
+u_hotwire = U_fnof_tnE((1:tf).',v_exp) ; % Corrleate voltage anemometor reading with velocity
 clauser_x = (y.*u_hotwire)./(nu_air)   ; % Clauser x input
-u_inf     = u_exp ;
+u_inf     = u_exp ; % Free stream velocity ( as seen by pitot tube )
 clauser_y = u_hotwire./u_inf ;
 
 logx_clau = log(clauser_x);
 
-Cf = .4545%  linspace(0,.5,5e2) ; %.4545  ;
+Cf = .4549%  linspace(0,.5,5e2) ; %.4545  ;
 clauser_x2 =(1/k) * sqrt(Cf/2).*log(y.*u_inf/nu_air)  + ...
         (1/k).*sqrt(Cf/2).*log(sqrt(Cf/2)) + A * sqrt(Cf/2) ;
 
@@ -174,36 +174,44 @@ xlabel('Distance From Wall [m]')
 %% Plot Clauser Graphs 
 
 %HIGH re
-figure ; semilogx((z_hre.*U_hre)/nu_hre ,  U_hre./Uinf_hre)
-title('Clauser plot, high re data') ;
-legend('High Re')
+% figure ; semilogx ((z_hre.*U_hre)/nu_hre ,  U_hre./Uinf_hre)
+% title('Clauser plot, high re data') ;
+% legend('High Re')
 
-figure;
+figure ;
 semilogx(exp(clauser_true),clauser_y) ;
-hold on ;
-shift=3.3;
-semilogx(exp(log(clauser_x)+shift),clauser_y) ;
-legend('Clauser Theory','Experimental')
-xlabel('y+') ; ylabel('U+');
+title('Inner scaled velocity variance') ; xlabel('y+') ; ylabel('U+') ;
+axis([5e3,1e6,0.4,1.02]) ;
 
-% Find experimental constant 
-Uplus_known = u_hotwire(data_p_l) / u_inf(data_p_l)
-yplus_known = (y(data_p_l)*u_hotwire(data_p_l)) / ( 1e2*nu_air)
+figure ; 
+deficit_y = (u_inf-u_hotwire)./(U_tau) ;
+semilogx(exp(clauser_true),deficit_y)  ;
+title('Outer scaled velocity profile (deficit form)');
+ylabel('u-uinf/utau') ; xlabel('y+') ;
 
-log_range = data_p_l:data_p_u
-logbit_uplus = (u_hotwire(log_range)) ./ (u_inf(log_range));
-logbit_yplus = (y(log_range).*u_hotwire(log_range))/ nu_air;
+% shift = 3.3 ;
+% semilogx(exp(log(clauser_x)+shift),clauser_y) ;
+% legend('Clauser Theory','Experimental') ;
+% xlabel('y+') ; ylabel('U+') ; 
 
-[xData, yData] = prepareCurveData( logbit_yplus, logbit_uplus );
-ft = fittype( 'a + .1384*log(x)', 'independent', 'x', 'dependent', 'y' );
-[log_bit_fit, gof] = fit( xData, yData, ft );
-
-rng = linspace(.1,3e4,1e2);
-figure ; plot(clauser_x,clauser_y) ; hold on ;
-plot(rng,log_bit_fit(rng))
-
-figure ; semilogx(rng,log_bit_fit(rng)) ; hold on ;
-semilogx(clauser_x,clauser_y)
+% % Find experimental constant 
+% Uplus_known = u_hotwire(data_p_l) / u_inf(data_p_l)
+% yplus_known = (y(data_p_l)*u_hotwire(data_p_l)) / ( 1e2*nu_air)
+% 
+% log_range = data_p_l:data_p_u
+% logbit_uplus = (u_hotwire(log_range)) ./ (u_inf(log_range));
+% logbit_yplus = (y(log_range).*u_hotwire(log_range))/ nu_air;
+% 
+% [xData, yData] = prepareCurveData( logbit_yplus, logbit_uplus );
+% ft = fittype( 'a + .1384*log(x)', 'independent', 'x', 'dependent', 'y' );
+% [log_bit_fit, gof] = fit( xData, yData, ft );
+% 
+% rng = linspace(.1,3e4,1e2);
+% figure ; plot(clauser_x,clauser_y) ; hold on ;
+% plot(rng,log_bit_fit(rng))
+% 
+% figure ; semilogx(rng,log_bit_fit(rng)) ; hold on ;
+% semilogx(clauser_x,clauser_y)
 
 % plot( log_bit_fit, xData, yData );
 % semilogx(log_bit_fit())
@@ -265,10 +273,4 @@ Cf_true;
 
 %% Qn6.7b, determine 
 nu_air./U_tau;
-
-
 %Re_d99=
-=======
-nu_air./U_tau
-%Re_d99=
->>>>>>> b15967112c1f0455feab0b219bf694192c702ec5
