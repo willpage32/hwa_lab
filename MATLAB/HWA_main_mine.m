@@ -33,10 +33,6 @@ legend('Pre-experiment calibration','Post-experiment calibration')
 onesies = ones(length(V_pr),1);
 t0 = 0 ; tf = 30 ; 
 t0s = t0*onesies ; tfs = tf*onesies ;
-%% Kings law
-%Discuss kings law... qn 6.3
-%h=a+b+vf.^c;
-
 
 %% Fit a surface to the data so we can evaluate at any time
 u_fit = [u_pr;u_po] ; E_fit = [V_pr;V_po] ; t_fit = [t0s ; tfs] ;
@@ -77,14 +73,14 @@ close all
 
 y = (z_exp./1000); % Distance from wall (m) (assumed
 
-u_hotwire = U_fnof_tnE((1:tf).',v_exp) ;
+u_hotwire = U_fnof_tnE((1:tf).',v_exp) ; % Corrleate voltage anemometor reading with velocity
 clauser_x = (y.*u_hotwire)./(nu_air)   ; % Clauser x input
-u_inf     = u_exp ;
+u_inf     = u_exp ; % Free stream velocity ( as seen by pitot tube )
 clauser_y = u_hotwire./u_inf ;
 
 logx_clau = log(clauser_x);
 
-Cf = .4545%  linspace(0,.5,5e2) ; %.4545  ;
+Cf = .4549%  linspace(0,.5,5e2) ; %.4545  ;
 clauser_x2 =(1/k) * sqrt(Cf/2).*log(y.*u_inf/nu_air)  + ...
         (1/k).*sqrt(Cf/2).*log(sqrt(Cf/2)) + A * sqrt(Cf/2) ;
 
@@ -129,24 +125,6 @@ U_tau = sqrt(tau_w./rho) ;                  %[Pa]/[kg/m^3] = [m/s]
 clauser_true =(1/k) * sqrt(Cf_true/2).*log(y.*u_inf/nu_air)  + ...
         (1/k).*sqrt(Cf_true/2).*log(sqrt(Cf_true/2)) + A * sqrt(Cf_true/2);
 
-%% Determine true wall location
-
-% legend('OG ex','theory','ex shifted')
-% 
-% wall_pos=1;
-% x_th_wall=clauser_x2(wall_pos)
-% x_ex_wall=logx_clau(wall_pos)
-% 
-% shift=%4.8053e-05*100
-% 
-%     y_new = (z_exp)./1000 .*shift;
-%     clauser_x_new = (y_new.*u_hotwire)./(nu_air)   ; % Clauser x input shifted with y
-%     
-%     figure ;
-%     semilogx(clauser_x_new,clauser_y) ;
-%     hold on ;
-%     semilogx(clauser_x,clauser_y,'b','lineWidth',2)     ;
-
 %% Variance
 
 %load('times.mat')
@@ -174,36 +152,44 @@ xlabel('Distance From Wall [m]')
 %% Plot Clauser Graphs 
 
 %HIGH re
-figure ; semilogx((z_hre.*U_hre)/nu_hre ,  U_hre./Uinf_hre)
-title('Clauser plot, high re data') ;
-legend('High Re')
+% figure ; semilogx ((z_hre.*U_hre)/nu_hre ,  U_hre./Uinf_hre)
+% title('Clauser plot, high re data') ;
+% legend('High Re')
 
-figure;
+figure ;
 semilogx(exp(clauser_true),clauser_y) ;
-hold on ;
-shift=3.3;
-semilogx(exp(log(clauser_x)+shift),clauser_y) ;
-legend('Clauser Theory','Experimental')
-xlabel('y+') ; ylabel('U+');
+title('Inner scaled velocity variance') ; xlabel('y+') ; ylabel('U+') ;
+axis([5e3,1e6,0.4,1.02]) ;
 
-% Find experimental constant 
-Uplus_known = u_hotwire(data_p_l) / u_inf(data_p_l)
-yplus_known = (y(data_p_l)*u_hotwire(data_p_l)) / ( 1e2*nu_air)
+figure ; 
+deficit_y = (u_inf-u_hotwire)./(U_tau) ;
+semilogx(exp(clauser_true),deficit_y)  ;
+title('Outer scaled velocity profile (deficit form)');
+ylabel('u-uinf/utau') ; xlabel('y+') ;
 
-log_range = data_p_l:data_p_u
-logbit_uplus = (u_hotwire(log_range)) ./ (u_inf(log_range));
-logbit_yplus = (y(log_range).*u_hotwire(log_range))/ nu_air;
+% shift = 3.3 ;
+% semilogx(exp(log(clauser_x)+shift),clauser_y) ;
+% legend('Clauser Theory','Experimental') ;
+% xlabel('y+') ; ylabel('U+') ; 
 
-[xData, yData] = prepareCurveData( logbit_yplus, logbit_uplus );
-ft = fittype( 'a + .1384*log(x)', 'independent', 'x', 'dependent', 'y' );
-[log_bit_fit, gof] = fit( xData, yData, ft );
-
-rng = linspace(.1,3e4,1e2);
-figure ; plot(clauser_x,clauser_y) ; hold on ;
-plot(rng,log_bit_fit(rng))
-
-figure ; semilogx(rng,log_bit_fit(rng)) ; hold on ;
-semilogx(clauser_x,clauser_y)
+% % Find experimental constant 
+% Uplus_known = u_hotwire(data_p_l) / u_inf(data_p_l)
+% yplus_known = (y(data_p_l)*u_hotwire(data_p_l)) / ( 1e2*nu_air)
+% 
+% log_range = data_p_l:data_p_u
+% logbit_uplus = (u_hotwire(log_range)) ./ (u_inf(log_range));
+% logbit_yplus = (y(log_range).*u_hotwire(log_range))/ nu_air;
+% 
+% [xData, yData] = prepareCurveData( logbit_yplus, logbit_uplus );
+% ft = fittype( 'a + .1384*log(x)', 'independent', 'x', 'dependent', 'y' );
+% [log_bit_fit, gof] = fit( xData, yData, ft );
+% 
+% rng = linspace(.1,3e4,1e2);
+% figure ; plot(clauser_x,clauser_y) ; hold on ;
+% plot(rng,log_bit_fit(rng))
+% 
+% figure ; semilogx(rng,log_bit_fit(rng)) ; hold on ;
+% semilogx(clauser_x,clauser_y)
 
 % plot( log_bit_fit, xData, yData );
 % semilogx(log_bit_fit())
@@ -263,12 +249,56 @@ H=delta_star/Theta;
 %Skin Friction Coefficient
 Cf_true;
 
-%% Qn6.7b, determine 
-nu_air./U_tau;
-
-
-%Re_d99=
-=======
+%% Qn6.7b, determine for high Re data 
+%[U_hre,Uinf_hre,nu_hre,uvar_hre,x_hre,z_hre] = read_highRe();
 nu_air./U_tau
-%Re_d99=
->>>>>>> b15967112c1f0455feab0b219bf694192c702ec5
+
+%Delta 99 - Bpoundary Layer thickness
+vel_ratio_hre=U_hre./Uinf_hre;
+[e_hre loc99_hre]=min(abs(vel_ratio_hre-.99));
+delta99_hre=z_hre(loc99_hre)
+
+%show the velocity on a plot
+figure; hold on; xlabel('Distance from Wall [m]');ylabel('Velocity')
+plot(z_hre,U_hre); plot(delta99_hre,U_hre(loc99_hre),'r*')
+legend('Hotwire Velocity High Re','99% U_0'); 
+
+%Delta* - Displacement Thickness
+%uses trapz to integrate w.r.t y
+T1_hre=(1-U_hre./Uinf_hre);
+delta_star_hre=trapz(z_hre,T1_hre);
+
+%\Theta - Momentum thickness
+T2_hre=(U_hre./Uinf_hre).*(1-U_hre./Uinf_hre);
+Theta_hre=trapz(z_hre,T2_hre);
+
+%H - Shape factor
+%The higher the value of H, the stronger the adverse pressure gradient. 
+%A high adverse pressure gradient can greatly reduce the Reynolds number at 
+%which transition into turbulence may occur.
+H=delta_star_hre/Theta_hre;
+
+%Skin Friction Coefficient
+Cf_true;
+
+
+%% Qn 7
+
+%find the data point
+[e loc90]=min(abs(vel_ratio-.90));
+
+%read in the daq
+data_string=['Data/'];
+daq_string=['.daq'];
+data_n=num2str(loc90,'%i');
+data_loc = strcat(data_string,data_n,daq_string);
+
+
+[daq_90,time,abstime] = daqread(data_loc);
+
+mean_90=mean(daq_90);
+mean_90=mean(daq_90);
+histogram(daq_90(:,1))
+
+
+
