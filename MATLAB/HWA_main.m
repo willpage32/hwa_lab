@@ -272,3 +272,25 @@ H=delta_star_hre/Theta_hre;
 
 %Skin Friction Coefficient
 Cf_true;
+
+
+%% Qn 7
+
+%find the data point
+[e loc90]=min(abs(vel_ratio-.90));
+
+%read in the daq
+data_string=['Data/'];
+daq_string=['.daq'];
+data_n=num2str(loc90,'%i');
+data_loc = strcat(data_string,data_n,daq_string);
+
+
+[daq_90,time,abstime] = daqread(data_loc);
+
+mean_90=mean(daq_90);
+mean_90=mean(daq_90);
+histogram(daq_90(:,1))
+
+
+
