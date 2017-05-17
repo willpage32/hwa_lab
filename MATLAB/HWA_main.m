@@ -66,17 +66,20 @@ A       = 5.0               ; % Clauser plot constant
 R       = 286.9             ; % Individual Gas Const. -> ( J/ (kg K) )
 T       = 20 + 273.15       ; % Temp in degrees Kelvin ()  
 rho     = P_exp/(R*T)       ; % Fluid density -> (kg/m^3)
-nu_air  = 15.11e-6          ; % Dynamic viscoity ( m^2 / s) 
+C1      = 1.458e-6          ; % Experimental? Constant from handout 
+nu_air  = C1*(T^(1.5))/(rho*(T+110.5)) ; % 
+% nu_air2 = 15.11e-6          ; % Dynamic viscoity ( m^2 / s) 
 
 %% Experimental clauser inputs 
 close all
 
 y = (z_exp./1000); % Distance from wall (m) (assumed
 
-u_hotwire = U_fnof_tnE((1:tf).',v_exp) ; % Corrleate voltage anemometor reading with velocity
-clauser_x = (y.*u_hotwire)./(nu_air)   ; % Clauser x input
 u_inf     = u_exp ; % Free stream velocity ( as seen by pitot tube )
-clauser_y = u_hotwire./u_inf ;
+u_hotwire = U_fnof_tnE((1:tf).',v_exp) ; % Corrleate voltage anemometor reading with velocity
+
+clauser_x = (y.*u_hotwire)./(nu_air)   ; % Clauser x input
+clauser_y = u_hotwire./u_inf ; %
 
 logx_clau = log(clauser_x);
 
@@ -149,7 +152,7 @@ plot(z_hre,uvar_hre)
 ylabel('Variance')
 xlabel('Distance From Wall [m]')
 
-%% Plot Clauser Graphs 
+%% Plot Clauser Graphs (QN 1 & 2)
 
 %HIGH re
 % figure ; semilogx ((z_hre.*U_hre)/nu_hre ,  U_hre./Uinf_hre)
@@ -299,6 +302,3 @@ data_loc = strcat(data_string,data_n,daq_string);
 mean_90=mean(daq_90);
 mean_90=mean(daq_90);
 histogram(daq_90(:,1))
-
-
-

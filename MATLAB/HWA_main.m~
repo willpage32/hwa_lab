@@ -66,7 +66,8 @@ A       = 5.0               ; % Clauser plot constant
 R       = 286.9             ; % Individual Gas Const. -> ( J/ (kg K) )
 T       = 20 + 273.15       ; % Temp in degrees Kelvin ()  
 rho     = P_exp/(R*T)       ; % Fluid density -> (kg/m^3)
-nu_air  = 15.11e-6          ; % Dynamic viscoity ( m^2 / s) 
+nu_air  = C1*(T^(1.5))/(rho*(T+110.5)) 
+nu_air2 = 15.11e-6          ; % Dynamic viscoity ( m^2 / s) 
 
 %% Experimental clauser inputs 
 close all
@@ -149,7 +150,7 @@ plot(z_hre,uvar_hre)
 ylabel('Variance')
 xlabel('Distance From Wall [m]')
 
-%% Plot Clauser Graphs 
+%% Plot Clauser Graphs (QN 1 & 2)
 
 %HIGH re
 % figure ; semilogx ((z_hre.*U_hre)/nu_hre ,  U_hre./Uinf_hre)
@@ -158,12 +159,14 @@ xlabel('Distance From Wall [m]')
 
 figure ;
 semilogx(exp(clauser_true),clauser_y) ;
-<<<<<<< HEAD
 title('Inner scaled velocity variance') ; xlabel('y+') ; ylabel('U+') ;
 axis([5e3,1e6,0.4,1.02]) ;
 
 figure ; 
-semilogx(exp(clauser_true),)
+deficit_y = (u_inf-u_hotwire)./(U_tau) ;
+semilogx(exp(clauser_true),deficit_y)  ;
+title('Outer scaled velocity profile (deficit form)');
+ylabel('u-uinf/utau') ; xlabel('y+') ;
 
 % shift = 3.3 ;
 % semilogx(exp(log(clauser_x)+shift),clauser_y) ;
@@ -188,32 +191,6 @@ semilogx(exp(clauser_true),)
 % 
 % figure ; semilogx(rng,log_bit_fit(rng)) ; hold on ;
 % semilogx(clauser_x,clauser_y)
-=======
-hold on ;
-shift=3.3;
-semilogx(exp(log(clauser_x)+shift),clauser_y) ;
-legend('Clauser Theory','Experimental')
-xlabel('y+') ; ylabel('U+');
-
-% Find experimental constant 
-Uplus_known = u_hotwire(data_p_l) / u_inf(data_p_l)
-yplus_known = (y(data_p_l)*u_hotwire(data_p_l)) / ( 1e2*nu_air)
-
-log_range = data_p_l:data_p_u
-logbit_uplus = (u_hotwire(log_range)) ./ (u_inf(log_range));
-logbit_yplus = (y(log_range).*u_hotwire(log_range))/ nu_air;
-
-[xData, yData] = prepareCurveData( logbit_yplus, logbit_uplus );
-ft = fittype( 'a + .1384*log(x)', 'independent', 'x', 'dependent', 'y' );
-[log_bit_fit, gof] = fit( xData, yData, ft );
-
-rng = linspace(.1,3e4,1e2);
-figure ; plot(clauser_x,clauser_y) ; hold on ;
-plot(rng,log_bit_fit(rng))
-
-figure ; semilogx(rng,log_bit_fit(rng)) ; hold on ;
-semilogx(clauser_x,clauser_y)
->>>>>>> fceb20417e7b8248f8c42cdc9d769c332d045fdf
 
 % plot( log_bit_fit, xData, yData );
 % semilogx(log_bit_fit())
@@ -273,11 +250,6 @@ H=delta_star/Theta;
 %Skin Friction Coefficient
 Cf_true;
 
-<<<<<<< HEAD
-%% Qn6.7b, determine 
-nu_air./U_tau;
-%Re_d99=
-=======
 %% Qn6.7b, determine for high Re data 
 %[U_hre,Uinf_hre,nu_hre,uvar_hre,x_hre,z_hre] = read_highRe();
 nu_air./U_tau
@@ -328,7 +300,3 @@ data_loc = strcat(data_string,data_n,daq_string);
 mean_90=mean(daq_90);
 mean_90=mean(daq_90);
 histogram(daq_90(:,1))
-
-
-
->>>>>>> fceb20417e7b8248f8c42cdc9d769c332d045fdf
