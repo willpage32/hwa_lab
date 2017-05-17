@@ -83,14 +83,14 @@ clauser_y = u_hotwire./u_inf ; %
 
 logx_clau = log(clauser_x);
 
-Cf = .4549%  linspace(0,.5,5e2) ; %.4545  ;
-clauser_x2 =(1/k) * sqrt(Cf/2).*log(y.*u_inf/nu_air)  + ...
-        (1/k).*sqrt(Cf/2).*log(sqrt(Cf/2)) + A * sqrt(Cf/2) ;
+Cf = .4549 %linspace(0,.5,5e2) ; %.4545  ;
+clauser_x2 = exp( (1/k) .* sqrt(Cf/2).*log(y.*u_inf./nu_air)  + ...
+        (1/k).*sqrt(Cf/2).*log(sqrt(Cf/2)) + A .* sqrt(Cf/2) );
 
 %% find the gradients of clauser and experimental, find Cf
 
-data_p_u=21;
-data_p_l=16;
+data_p_u = 21 ;
+data_p_l = 16 ;
 
 x_th_1=clauser_x2(data_p_l,:);
 x_th_2=clauser_x2(data_p_u,:);
@@ -98,8 +98,8 @@ x_th_2=clauser_x2(data_p_u,:);
 y_th_1=clauser_y(data_p_l);
 y_th_2=clauser_y(data_p_u);
 
-x_ex_1=logx_clau(data_p_l);
-x_ex_2=logx_clau(data_p_u);
+x_ex_1 = logx_clau(data_p_l);
+x_ex_2 = logx_clau(data_p_u);
 
 rise=y_th_2-y_th_1;
 run_th=x_th_2-x_th_1;
@@ -218,7 +218,6 @@ ylabel('u-uinf/utau') ; xlabel('y+') ;
 % plot([0:.001:1],f)
 % 
 % [acor,lag] =xcorr(clauser_true,log(clauser_x));
-% 
 % [acor,lag']
 
 %% Qn6.7a, determine \delta_{99}, \delta*, \theta , H , Cf
