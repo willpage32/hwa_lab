@@ -12,7 +12,7 @@ clc, clear , close all
 path_pre  = 'Data/pre'  ; % Pre-calibration path 
 path_post = 'Data/post' ; % Post-calibration path 
 
-% Read in data from summary matrices
+% Read in data from summary matricesU_plus_hre
 [u_pre ,V_pre ,Tpr	 ,Ppr ]       = read_summary(path_pre)  ; % Pre -calibration  
 [u_post,V_post,T_post,P_atm_post] = read_summary(path_post) ; % Post-calibration
 
@@ -79,18 +79,17 @@ nu_air  = C1*(T^(1.5))/(rho*(T+110.5))  %
 close all
 
 y = (z_exp./1000) ; % Distance from wall (m) (assumed measured in mm) 
-u_inf     = u_exp ; % Free stream velocity ( as seen by pitot tube )
+
 u_hotwire = U_fnof_tnE((1:tf).',v_exp) ; % Corrleate voltage anemometor reading with velocity
 
-clauser_x = (y.*u_hotwire)./(nu_air)   ; % EXPERIMENT Clauser x input
+y_plus_exp = (y.*u_hotwire)./(nu_air)   ; % EXPERIMENT Clauser x input
 % scale by u_tau not u infinity 
-% u+ should come to around 
-clauser_y = u_hotwire./u_inf           ; % EXPERIMENT Clauser y input
+% u+ should come to around ...
+u_plusA_exp = u_hotwire./u_inf           ; % EXPERIMENT Clauser y input
 
-logx_clau = log(clauser_x);
+logx_clau = log(y_plus_exp);
 
-clau_exfig = figure ; clau_exax = semilogx(clauser_x , clauser_y,'lineWidth',2) ; 
-hold on
+figure ; semilogx(y_plus_exp , u_plusA_exp,'lineWidth',2) ;  hold on
 % HIGH re
 semilogx ((z_hre.*U_hre)/nu_hre ,  U_hre./Uinf_hre)
 
@@ -101,9 +100,45 @@ xlabel('y^{+} = (y u / \nu)') ; ylabel('U+ = u/u_{\infty}')
 Cf = linspace(0,.5,5e2) ; %.4545  ; %.4549 %
 clauser_x2 = exp( (1/k) .* sqrt(Cf/2).*log(y.*u_inf./nu_air)  + ...
         (1/k).*sqrt(Cf/2).*log(sqrt(Cf/2)) + A .* sqrt(Cf/2) );
+logx_clau2 = log(clauser_x2);
+hold on ;
+semilogx(clauser_x2,u_plusA_exp)
 
-logx_clau2=log(clauser_x2);
-    
+%% Find the HIGH RE friction velocity
+% [U_hre,Uinf_hre,nu_hre,uvar_hre,x_hre,z_hre] 
+
+U_plus_hre = U_hre/Uinf_hre;
+
+cf_guess_hre = linspace(0,1,1e1);
+
+y_plus_theory_hre = exp ((1/k) .* sqrt(cf_guess_hre/2).*log(z_hre.*Uinf_hre/nu_hre)  + ...
+	(1/k).*sqrt(cf_guess_hre/2).*log(sqrt(cf_guess_hre/2)) + A * sqrt(cf_guess_hre/2) );
+
+y_plus_hre = (z_hre.*U_hre)/nu_hre
+
+figure ; semilogx(y_plus_hre,U_plus_hre)
+size(y_plus_theory_hre)
+
+figure ; semilogx(y_plus_theory_hre,U_plus_hre,'-o')
+hold on ;
+ semilogx(y_plus_hre,U_plus_hre)
+
+% x = 3.3e4 ; y = 0.774 lin end point
+% x = 2.5e3 ; y = 0.557 lin st point
+
+[mr_yplus_s, idx_yplus_st ] = min(abs(U_plus_hre-0.56));
+[mr_yplus_e, idx_yplus_end] = min(abs(U_plus_hre-0.77));
+
+grad_hre_exp = (U_plus_hre(idx_yplus_st) - U_plus_hre(idx_yplus_end)) / ...
+    (y_plus_hre(idx_yplus_st) - y_plus_hre(idx_yplus_end))
+
+% 0.55 and 0.7 seem good U+ to seartch for linear regions
+
+
+% grad_hre_theory  = y_plus_theory_hre - 
+
+% [min_res idx_cf] = min(abs(diff_fn));
+
 %% find the gradients of clauser and experimental, find Cf
 
 data_p_u = 21 ;
@@ -112,8 +147,8 @@ data_p_l = 16 ;
 x_th_1=logx_clau2(data_p_l,:);
 x_th_2=logx_clau2(data_p_u,:);
 
-y_th_1=clauser_y(data_p_l);
-y_th_2=clauser_y(data_p_u);
+y_th_1=u_plusA_exp(data_p_l);
+y_th_2=u_plusA_exp(data_p_u);
 
 x_ex_1 = logx_clau(data_p_l);
 x_ex_2 = logx_clau(data_p_u);
@@ -130,6 +165,8 @@ grad_diff=grad_th-grad_ex;
 [e Cf_loc]=min(abs(grad_diff));
 Cf_true=Cf(Cf_loc)
 
+figure ; semilogx()
+
 figure;
 hold on
 plot(Cf,grad_diff,'*')
@@ -140,14 +177,13 @@ plot(Cf(Cf_loc),grad_diff(Cf_loc),'-p',...
 title('Difference Between Log Region Gradients for Varying C_f');
 xlabel('C_f')
 ylabel('Difference (unitless)')
-figure_format(); 
+% figure_format(); 
 
 
 %% Caluclate Tau and U_tau
 % once Cf is found out, we can calculate tau_w and then U_tau
 tau_w = Cf_true .*(1/2).*rho.*(u_inf.^2) ;  %[Pa]  or  N/m^2 
 U_tau = sqrt(tau_w./rho) ;                  %[Pa]/[kg/m^3] = [m/s]
-
 y_exp_u_tau=u_hotwire/U_tau;
 %% Define true Clauser plot
 
@@ -190,7 +226,7 @@ xlabel('Distance From Wall [m]')
 % legend('High Re')
 
 figure ;    
-semilogx(exp(clauser_true),clauser_y) ;
+semilogx(exp(clauser_true),u_plusA_exp) ;
 title('THEORETICAL Inner scaled velocity variance') ; xlabel('y+') ; ylabel('U+') ;
 axis([5e3,1e6,0.4,1.02]) ;
 
