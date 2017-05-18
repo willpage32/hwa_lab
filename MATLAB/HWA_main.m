@@ -90,17 +90,19 @@ figure_format(); axis([1.5e2,3e4,.4,1.01]) ;
 title('Clauser Chart - Experimental data only ') ;
 xlabel('y^{+} = (y u / \nu)') ; ylabel('U+ = u/u_{\infty}')
 
-Cf = .4549 %linspace(0,.5,5e2) ; %.4545  ;
+Cf = linspace(0,.5,5e2) ; %.4545  ; %.4549 %
 clauser_x2 = exp( (1/k) .* sqrt(Cf/2).*log(y.*u_inf./nu_air)  + ...
         (1/k).*sqrt(Cf/2).*log(sqrt(Cf/2)) + A .* sqrt(Cf/2) );
 
+logx_clau2=log(clauser_x2);
+    
 %% find the gradients of clauser and experimental, find Cf
 
 data_p_u = 21 ;
 data_p_l = 16 ;
 
-x_th_1=clauser_x2(data_p_l,:);
-x_th_2=clauser_x2(data_p_u,:);
+x_th_1=logx_clau2(data_p_l,:);
+x_th_2=logx_clau2(data_p_u,:);
 
 y_th_1=clauser_y(data_p_l);
 y_th_2=clauser_y(data_p_u);
@@ -117,13 +119,23 @@ grad_ex=rise./run_ex;
 
 grad_diff=grad_th-grad_ex;
 
-% figure;
-% hold on
-% plot(Cf,grad_diff,'*')
-% plot(Cf,zeros(size(Cf)));
-
 [e Cf_loc]=min(abs(grad_diff));
 Cf_true=Cf(Cf_loc)
+
+figure;
+hold on
+plot(Cf,grad_diff,'*')
+plot(Cf,zeros(size(Cf)));
+plot(Cf(Cf_loc),grad_diff(Cf_loc),'-p',...
+    'MarkerFaceColor',[255 105 180]./256,...
+    'MarkerSize',35)
+title('Difference Between Log Region Gradients for Varying C_f');
+xlabel('C_f')
+ylabel('Difference (unitless)')
+figure_format(); 
+
+
+
 
 %% Caluclate Tau and U_tau
 % once Cf is found out, we can calculate tau_w and then U_tau
@@ -178,7 +190,7 @@ title('THEORETICAL Outer scaled velocity profile (deficit form)');
 ylabel('u-uinf/utau') ; xlabel('y+') ;
 
 figure ; 
-semilogx()
+%semilogx()
 % shift = 3.3 ;
 % semilogx(exp(log(clauser_x)+shift),clauser_y) ;
 % legend('Clauser Theory','Experimental') ;
