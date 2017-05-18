@@ -28,7 +28,7 @@ V_po = linspace(min(u_post),max(u_post),1e2).' ;
 
 u_pr = u_prfit(V_pr) ; u_po = u_pofit(V_po)  ;  
 
-fitfns = figure ; figure_format(fitfns) ;
+fitfns = figure ; figure_format() ;
 hold on ; plot(u_pr,V_pr) ; plot(u_po,V_po) ;
 legend('Pre-experiment calibration','Post-experiment calibration')
 title('Fitted calibration fns')
@@ -60,7 +60,7 @@ title('Time linear interpolated U vs E correltation surface inputs')
 %% Load in the high reynolds data
 [U_hre,Uinf_hre,nu_hre,uvar_hre,x_hre,z_hre] = read_highRe();
 
-%% Read in the esummary data
+%% Read in the summary data
 path_data = 'Data/';
 [u_exp,v_exp,T_exp,T2_exp,P_exp,z_exp,f_exp] = read_summary_d(path_data);
 
@@ -72,20 +72,24 @@ T       = 20 + 273.15       ; % Temp in degrees Kelvin ()
 rho     = P_exp/(R*T)        % Fluid density -> (kg/m^3)
 C1      = 1.458e-6          ; % Experimental? Constant from handout 
 nu_air  = C1*(T^(1.5))/(rho*(T+110.5))  % 
-% nu_air2 = 15.11e-6          ; % Dynamic viscoity ( m^2 / s) 
 
 %% Experimental clauser inputs 
 close all
 
-y = (z_exp./1000); % Distance from wall (m) (assumed
-
+y = (z_exp./1000) ; % Distance from wall (m) (assumed measured in mm) 
 u_inf     = u_exp ; % Free stream velocity ( as seen by pitot tube )
 u_hotwire = U_fnof_tnE((1:tf).',v_exp) ; % Corrleate voltage anemometor reading with velocity
 
-clauser_x = (y.*u_hotwire)./(nu_air)   ; % Clauser x input
-clauser_y = u_hotwire./u_inf ; %
+clauser_x = (y.*u_hotwire)./(nu_air)   ; % EXPERIMENT Clauser x input
+clauser_y = u_hotwire./u_inf           ; % EXPERIMENT Clauser y input
 
 logx_clau = log(clauser_x);
+
+clau_exfig = figure ; clau_exax = semilogx(clauser_x , clauser_y) ; 
+figure_format();
+title('Clauser Chart - Experimental data only ') ; xlabel('y^{+} = (y u / \nu)') ;
+ylabel('U+ = u/u_{\infty}')
+
 
 Cf = .4549 %linspace(0,.5,5e2) ; %.4545  ;
 clauser_x2 = exp( (1/k) .* sqrt(Cf/2).*log(y.*u_inf./nu_air)  + ...
