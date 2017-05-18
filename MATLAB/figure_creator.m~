@@ -1,4 +1,4 @@
-function figure_format(fig_handle)
+function figure_creator(fig_handle)
 
 % Create axes
 axes1 = axes('Parent',fig_handle,'FontSize',14,...

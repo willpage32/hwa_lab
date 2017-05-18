@@ -28,11 +28,15 @@ V_po = linspace(min(u_post),max(u_post),1e2).' ;
 
 u_pr = u_prfit(V_pr) ; u_po = u_pofit(V_po)  ;  
 
-figure ; hold on ; plot(u_pr,V_pr) ; plot(u_po,V_po) ; title('Fitted calibration fns')
+fitfns = figure ; figure_format(fitfns) ;
+hold on ; plot(u_pr,V_pr) ; plot(u_po,V_po) ;
 legend('Pre-experiment calibration','Post-experiment calibration')
+title('Fitted calibration fns')
+
 onesies = ones(length(V_pr),1);
 t0 = 0 ; tf = 30 ; 
 t0s = t0*onesies ; tfs = tf*onesies ;
+
 
 %% Fit a surface to the data so we can evaluate at any time
 u_fit = [u_pr;u_po] ; E_fit = [V_pr;V_po] ; t_fit = [t0s ; tfs] ;
@@ -49,7 +53,7 @@ figure ; plot(U_fnof_tnE,[t_fit,E_fit],u_fit) ;
 xlabel('time axis') ; ylabel('voltage axis') ; zlabel('velocity axis');
 title('Time linear interpolated U vs E correltation surface inputs')
 
-% figure; surf(T,V,u_fn)
+% surfer = figure;  figure_format(surfer) ;surf(T,V,u_fn)
 % xlabel('time axis') ; ylabel('voltage axis') ; zlabel('velocity axis');
 % title('Time linear interpolated U vs E correltation surface')
 
@@ -65,9 +69,9 @@ k       = 0.4               ; % Von karman constant
 A       = 5.0               ; % Clauser plot constant
 R       = 286.9             ; % Individual Gas Const. -> ( J/ (kg K) )
 T       = 20 + 273.15       ; % Temp in degrees Kelvin ()  
-rho     = P_exp/(R*T)       ; % Fluid density -> (kg/m^3)
+rho     = P_exp/(R*T)        % Fluid density -> (kg/m^3)
 C1      = 1.458e-6          ; % Experimental? Constant from handout 
-nu_air  = C1*(T^(1.5))/(rho*(T+110.5)) ; % 
+nu_air  = C1*(T^(1.5))/(rho*(T+110.5))  % 
 % nu_air2 = 15.11e-6          ; % Dynamic viscoity ( m^2 / s) 
 
 %% Experimental clauser inputs 
