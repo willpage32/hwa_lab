@@ -15,14 +15,9 @@ axes1 = axes('Parent',figure1,'XMinorTick','on','XScale','log',...
 box(axes1,'on');
 hold(axes1,'on');
 
-% Create semilogx
-semilogx(X1,Y1);
-
-% Create xlabel
-xlabel('y+','FontSize',14);
-
-% Create ylabel
-ylabel('u-uinf/utau','FontSize',14);
+semilogx(X1,Y1); % DO PLOT
+xlabel('y+','FontSize',14); % Create xlabel
+ylabel('u-uinf/utau','FontSize',14); % Create ylabel
 
 % Create title
 title('Outer scaled velocity profile (deficit form)','FontSize',16);

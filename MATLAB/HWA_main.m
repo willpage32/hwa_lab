@@ -154,22 +154,24 @@ xlabel('Distance From Wall [m]')
 
 %% Plot Clauser Graphs (QN 1 & 2)
 
-%HIGH re
+% % HIGH re
 % figure ; semilogx ((z_hre.*U_hre)/nu_hre ,  U_hre./Uinf_hre)
 % title('Clauser plot, high re data') ;
 % legend('High Re')
 
-figure ;
+figure ;    
 semilogx(exp(clauser_true),clauser_y) ;
-title('Inner scaled velocity variance') ; xlabel('y+') ; ylabel('U+') ;
+title('THEORETICALInner scaled velocity variance') ; xlabel('y+') ; ylabel('U+') ;
 axis([5e3,1e6,0.4,1.02]) ;
 
 figure ; 
 deficit_y = (u_inf-u_hotwire)./(U_tau) ;
 semilogx(exp(clauser_true),deficit_y)  ;
-title('Outer scaled velocity profile (deficit form)');
+title('THEORETICAL Outer scaled velocity profile (deficit form)');
 ylabel('u-uinf/utau') ; xlabel('y+') ;
 
+figure ; 
+semilogx()
 % shift = 3.3 ;
 % semilogx(exp(log(clauser_x)+shift),clauser_y) ;
 % legend('Clauser Theory','Experimental') ;
