@@ -85,11 +85,10 @@ clauser_y = u_hotwire./u_inf           ; % EXPERIMENT Clauser y input
 
 logx_clau = log(clauser_x);
 
-clau_exfig = figure ; clau_exax = semilogx(clauser_x , clauser_y) ; 
-figure_format();
-title('Clauser Chart - Experimental data only ') ; xlabel('y^{+} = (y u / \nu)') ;
-ylabel('U+ = u/u_{\infty}')
-
+clau_exfig = figure ; clau_exax = semilogx(clauser_x , clauser_y,'lineWidth',2) ; 
+figure_format(); axis([1.5e2,3e4,.4,1.01]) ;
+title('Clauser Chart - Experimental data only ') ;
+xlabel('y^{+} = (y u / \nu)') ; ylabel('U+ = u/u_{\infty}')
 
 Cf = .4549 %linspace(0,.5,5e2) ; %.4545  ;
 clauser_x2 = exp( (1/k) .* sqrt(Cf/2).*log(y.*u_inf./nu_air)  + ...
