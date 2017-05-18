@@ -148,7 +148,6 @@ figure_format();
 tau_w = Cf_true .*(1/2).*rho.*(u_inf.^2) ;  %[Pa]  or  N/m^2 
 U_tau = sqrt(tau_w./rho) ;                  %[Pa]/[kg/m^3] = [m/s]
 
-y_exp_u_tau=u_hotwire/U_tau;
 %% Define true Clauser plot
 
 clauser_true =(1/k) * sqrt(Cf_true/2).*log(y.*u_inf/nu_air)  + ...

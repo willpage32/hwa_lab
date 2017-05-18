@@ -60,6 +60,8 @@ title('Time linear interpolated U vs E correltation surface inputs')
 %% Load in the high reynolds data
 [U_hre,Uinf_hre,nu_hre,uvar_hre,x_hre,z_hre] = read_highRe();
 
+% utau should be around 30 - n.hutch 445 
+% upper limit at 15% of the layer thickness 
 %% Read in the summary data
 path_data = 'Data/';
 [u_exp,v_exp,T_exp,T2_exp,P_exp,z_exp,f_exp] = read_summary_d(path_data);
@@ -81,12 +83,18 @@ u_inf     = u_exp ; % Free stream velocity ( as seen by pitot tube )
 u_hotwire = U_fnof_tnE((1:tf).',v_exp) ; % Corrleate voltage anemometor reading with velocity
 
 clauser_x = (y.*u_hotwire)./(nu_air)   ; % EXPERIMENT Clauser x input
+% scale by u_tau not u infinity 
+% u+ should come to around 
 clauser_y = u_hotwire./u_inf           ; % EXPERIMENT Clauser y input
 
 logx_clau = log(clauser_x);
 
 clau_exfig = figure ; clau_exax = semilogx(clauser_x , clauser_y,'lineWidth',2) ; 
-figure_format(); axis([1.5e2,3e4,.4,1.01]) ;
+hold on
+% HIGH re
+semilogx ((z_hre.*U_hre)/nu_hre ,  U_hre./Uinf_hre)
+
+% figure_format(); axis([1.5e2,3e4,.4,1.01]) ;
 title('Clauser Chart - Experimental data only ') ;
 xlabel('y^{+} = (y u / \nu)') ; ylabel('U+ = u/u_{\infty}')
 
@@ -126,15 +134,13 @@ figure;
 hold on
 plot(Cf,grad_diff,'*')
 plot(Cf,zeros(size(Cf)));
-plot(Cf(Cf_loc),grad_diff(Cf_loc),'-p','MarkerIndices',[idxmin idxmax],...
-    'MarkerFaceColor','red',...
-    'MarkerSize',15)
+plot(Cf(Cf_loc),grad_diff(Cf_loc),'-p',...
+    'MarkerFaceColor',[255 105 180]./256,...
+    'MarkerSize',35)
 title('Difference Between Log Region Gradients for Varying C_f');
 xlabel('C_f')
 ylabel('Difference (unitless)')
 figure_format(); 
-
-
 
 
 %% Caluclate Tau and U_tau
@@ -142,6 +148,7 @@ figure_format();
 tau_w = Cf_true .*(1/2).*rho.*(u_inf.^2) ;  %[Pa]  or  N/m^2 
 U_tau = sqrt(tau_w./rho) ;                  %[Pa]/[kg/m^3] = [m/s]
 
+y_exp_u_tau=u_hotwire/U_tau;
 %% Define true Clauser plot
 
 clauser_true =(1/k) * sqrt(Cf_true/2).*log(y.*u_inf/nu_air)  + ...
@@ -171,16 +178,20 @@ plot(z_hre,uvar_hre)
 ylabel('Variance')
 xlabel('Distance From Wall [m]')
 
+% 1/20 for low re, 1/40 for high re.
+% 2 methods are eqiuvlant.
+
 %% Plot Clauser Graphs (QN 1 & 2)
 
 % % HIGH re
 % figure ; semilogx ((z_hre.*U_hre)/nu_hre ,  U_hre./Uinf_hre)
+% hold on
 % title('Clauser plot, high re data') ;
 % legend('High Re')
 
 figure ;    
 semilogx(exp(clauser_true),clauser_y) ;
-title('THEORETICALInner scaled velocity variance') ; xlabel('y+') ; ylabel('U+') ;
+title('THEORETICAL Inner scaled velocity variance') ; xlabel('y+') ; ylabel('U+') ;
 axis([5e3,1e6,0.4,1.02]) ;
 
 figure ; 
@@ -189,7 +200,6 @@ semilogx(exp(clauser_true),deficit_y)  ;
 title('THEORETICAL Outer scaled velocity profile (deficit form)');
 ylabel('u-uinf/utau') ; xlabel('y+') ;
 
-figure ; 
 %semilogx()
 % shift = 3.3 ;
 % semilogx(exp(log(clauser_x)+shift),clauser_y) ;
@@ -304,6 +314,7 @@ H=delta_star_hre/Theta_hre;
 %Skin Friction Coefficient
 Cf_true;
 
+retau= delta99_hre*U_tau/nu_air
 
 %% Qn 7
 
