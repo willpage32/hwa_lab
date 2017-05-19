@@ -161,8 +161,8 @@ figure_format();
 %Determine for low Re (experimental data)
 
 %Delta 99 - Bpoundary Layer thickness
-vel_ratio=u_bar_lre./U_inf_lre;
-[e loc99]=min(abs(vel_ratio-.99));
+vel_ratio_lre=u_bar_lre./U_inf_lre;
+[e loc99]=min(abs(vel_ratio_lre-.99));
 delta99_lre=z_lre(loc99)
 
 %show the velocity on a plot
@@ -550,28 +550,38 @@ figure_format();
 % % [acor,lag']
 % 
 % 
-% %% Qn 7
-% 
-% %find the data point
-% [e loc90]=min(abs(vel_ratio-.90));
-% 
-% %read in the daq
-% data_string=['Data/'];
-% daq_string=['.daq'];
-% data_n=num2str(loc90,'%i');
-% data_loc = strcat(data_string,data_n,daq_string);
-% 
-% 
-% [daq_90,time,abstime] = daqread(data_loc);
-% 
-% mean_90=mean(daq_90);
-% mean_90=mean(daq_90);
-% histogram(daq_90(:,1))
+%% Qn 7
+
+%find the data point
+[e loc90]=min(abs(vel_ratio_lre-.90));
+
+loc90
+
+%read in the daq
+data_string=['Data/'];
+daq_string=['.daq'];
+data_n=num2str(loc90,'%i');
+data_loc = strcat(data_string,data_n,daq_string);
 
 
-% %% Functions
-% 
-% function output = clauser_fn(Cf)
-%               (1/k).*sqrt(Cf/2).*z_plus + ...
-%               (1/k).*sqrt(Cf/2).*log(sqrt(Cf/2)) + ...
-%                    A*sqrt(Cf/2);end
+[daq_90,time,abstime] = daqread(data_loc);
+
+u_90=U_fnof_tnE(1,daq_90(:,1)');
+
+figure;
+n=1:length(u_90);
+t=n*1/30000;
+plot(t,u_90)
+xlabel('Time (s)')
+ylabel('Velocity (m/s)')
+title('Raw Velocity Signal')
+grid on
+figure_format(); 
+
+figure;
+histogram(u_90-mean(u_90),130)
+xlabel('Velocity Fluctuation')
+ylabel('Frequency')
+title('Probability Density Function of Raw Velocity Signal')
+grid on
+figure_format(); 

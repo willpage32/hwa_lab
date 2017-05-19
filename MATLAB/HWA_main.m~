@@ -22,11 +22,15 @@ path_post = 'Data/post' ; % Post-calibration path
 [u_prfit, Gpr] = fit(xd1, yd1, fittype('poly3')) ; % Create the  pre-fit
 [u_pofit, Gpo] = fit(xd2, yd2, fittype('poly3')) ; % Create the post-fit
 
+%% KINGS LAW FIT
+
 % Velocity fucntions describing some new 'u'
 V_pr = linspace(min(u_pre) ,max(u_pre) ,1e2).' ; 
 V_po = linspace(min(u_post),max(u_post),1e2).' ; 
 
 u_pr = u_prfit(V_pr) ; u_po = u_pofit(V_po)  ;  
+
+createFit_KINGS(V_pr, u_pr)
 
 fitfns = figure ; figure_format() ;
 hold on ; plot(u_pr,V_pr) ; plot(u_po,V_po) ;
@@ -58,7 +62,7 @@ title('Time linear interpolated U vs E correltation surface inputs')
 % title('Time linear interpolated U vs E correltation surface')
 
 %% Load in the high reynolds data
-[u_bar_hre,U_inf_hre,nu_hre,uvar_hre,x_hre,z_hre] = read_highRe();
+[u_bar_hre,U_inf_hre,nu_hre,u_var_hre,x_hre,z_hre] = read_highRe();
 
 % utau should be around 30 - n.hutch 445 
 % upper limit at 15% of the layer thickness 
@@ -220,51 +224,106 @@ Re_tau_hre= delta99_hre*U_tau_hre/nu_air;
 %% Inner scaled/outer scaled velocity
 
 %%%%%High Re%%%%%
-%Outer
+%inner
 close all
 figure;
-semilogx(exp(zplus_hre),(U_inf_hre - u_bar_hre)/U_tau_hre);
-xlabel('1/\kappa ln(z/\delta) + B')
+semilogx(exp(zplus_hre),(u_bar_hre)/U_tau_hre,'r');
+xlabel('z^+')
+ylabel('u/U_{\tau}')
+title('Inner Scaled Mean Velocity Profile - High Re')
+grid on
+figure_format(); 
+
+%outer
+figure;
+semilogx(z_hre/delta99_hre,(U_inf_hre - u_bar_hre)/U_tau_hre,'r');
+xlabel('z/\delta')
 ylabel('(U_{\infty}- u)/U_{\tau}')
 title('Outer Scaled Mean Velocity Profile - High Re')
 grid on
 figure_format(); 
 
+%%%%%Low Re%%%%%
+%Inner
 figure;
-semilogx(exp(zplus_hre),(U_inf_hre - u_bar_hre)/U_tau_hre);
-xlabel('1/\kappa ln(z/\delta) + B')
-ylabel('(U_{\infty}- u)/U_{\tau}')
-title('Outer Scaled Mean Velocity Profile - High Re')
+semilogx(exp(zplus_lre),(u_bar_lre)/U_tau_lre);
+xlabel('z^+')
+ylabel('u/U_{\tau}')
+title('Inner Scaled Mean Velocity Profile - Low Re')
 grid on
+figure_format(); 
+%outer
+figure;
+semilogx(z_lre/delta99_lre,(U_inf_lre - u_bar_lre)/U_tau_lre);
+xlabel('z/\delta')
+ylabel('(U_{\infty}- u)/U_{\tau}')
+title('Outer Scaled Mean Velocity Profile - Low Re')
+grid on
+figure_format(); 
+
+%% Comparison Plot
+
+%Inner
+figure;
+semilogx(exp(zplus_lre+.25),(u_bar_lre)/U_tau_lre);
+xlabel('z^+')
+ylabel('u/U_{\tau}')
+title('Inner Scaled Mean Velocity Profile Comparison')
+grid on
+hold on
+semilogx(exp(zplus_hre),(u_bar_hre)/U_tau_hre,'r');
+legend('Low  Re','High Re')
 figure_format(); 
 
 %%
+% B_hre=7;
+% 
+% LHS_hre_outer = (U_inf_hre - u_bar_hre)/U_tau_hre ;
+% RHS_hre_outer = (1/k)*log(z_hre/delta99_hre)+B_hre;
+% 
+% %Inner
+% LHS_hre_inner = (u_bar_hre)/U_tau_hre ;
+% RHS_hre_inner = (1/k)*log(z_hre*U_tau_hre/nu_air)+A;
+% 
+% figure;
+% semilogx(RHS_hre_outer,LHS_hre_outer);
+% xlabel('1/\kappa ln(z/\delta) + B')
+% ylabel('(U_{\infty}- u)/U_{\tau}')
+% title('Outer Scaled')
+% grid on
+% figure_format(); 
+% 
+% figure;
+% semilogx(RHS_hre_inner,LHS_hre_inner);
+% xlabel('1/\kappa ln(z U_\tau / \nu) + A')
+% ylabel('u/U_{\tau}')
+% title('Inner Scaled')
+% grid on
+% figure_format(); 
 
-B_hre=7;
+%% Variance
 
-LHS_hre_outer = (U_inf_hre - u_bar_hre)/U_tau_hre ;
-RHS_hre_outer = (1/k)*log(z_hre/delta99_hre)+B_hre;
 
-%Inner
-LHS_hre_inner = (u_bar_hre)/U_tau_hre ;
-RHS_hre_inner = (1/k)*log(z_hre*U_tau_hre/nu_air)+A;
+%load('times.mat')
+load('volts.mat')
 
-figure;
-semilogx(RHS_hre_outer,LHS_hre_outer);
-xlabel('1/\kappa ln(z/\delta) + B')
-ylabel('(U_{\infty}- u)/U_{\tau}')
-title('Outer Scaled')
+voltage_variance=var(volt_full);
+u_var_lre = U_fnof_tnE((1:tf).',voltage_variance') ;
+
+%%  Plot Variance QN3/4
+figure; 
+semilogx(exp(zplus_lre),u_var_lre,'o-')  % what units are zexp and zhre in?
+hold on
+semilogx(exp(zplus_hre),u_var_hre,'r-p')
+xlabel('z^+')
+ylabel('Variance')
+title('Inner Scaled Turbulance Intensity Profiles')
 grid on
+legend('Low Re','High Re')
 figure_format(); 
 
-figure;
-semilogx(RHS_hre_inner,LHS_hre_inner);
-xlabel('1/\kappa ln(z U_\tau / \nu) + A')
-ylabel('u/U_{\tau}')
-title('Inner Scaled')
-grid on
-figure_format(); 
-
+% 1/20 for low re, 1/40 for high re.
+% 2 methods are eqiuvlant.
 
 
 % %Low Re
@@ -281,34 +340,7 @@ figure_format();
 % grid on
 % figure_format(); 
 
-%%Old clauser stuff
-% 
-% clauser_x2 = exp( (1/k)  .* sqrt(Cf/2).*log(y.*u_inf./nu_air)  + ...
-%         (1/k).*sqrt(Cf/2).*log(sqrt(Cf/2)) + A .* sqrt(Cf/2) );
-% logx_clau2 = log(clauser_x2);
-% hold on ;
-% semilogx(clauser_x2,u_plusA_exp)
-% break
 
-% %% Find the HIGH RE friction velocity
-% % High Reynolds data : [U_hre,Uinf_hre,nu_hre,uvar_hre,x_hre,z_hre] 
-% 
-% U_infplus_hre = U_hre/Uinf_hre      ; % First normalise by U_inftyf
-% % cf_guess_hre = linspace(0.2,.5,5e2) ; % Vector of guesses for Cf
-% cf_guess_hre = 0.4091;
-% 
-% y_plus_theory_hre = exp ((1/k) .* sqrt(cf_guess_hre/2).*log(z_hre.*Uinf_hre/nu_hre)  + ...
-% 	(1/k).*sqrt(cf_guess_hre/2).*log(sqrt(cf_guess_hre/2)) + A * sqrt(cf_guess_hre/2) );
-% 
-% y_plus_hre = (z_hre.*U_hre)/nu_hre;
-% 
-% figure ; semilogx(y_plus_hre,U_infplus_hre) ; title('Experimental U+ , y+');
-% xlabel('y+'); ylabel('U+');
-% 
-% figure ; semilogx(y_plus_theory_hre,U_infplus_hre,'-o') ; hold on ;
-% semilogx(y_plus_hre,U_infplus_hre);
-% title('Comparition of U+/y+ for varying cf to find U_{tau}');
-% xlabel('y+'); ylabel('U+');
 % 
 % % 0.55 and 0.7 seem good U+ to seartch for linear regions
 % 
@@ -518,28 +550,35 @@ figure_format();
 % % [acor,lag']
 % 
 % 
-% %% Qn 7
-% 
-% %find the data point
-% [e loc90]=min(abs(vel_ratio-.90));
-% 
-% %read in the daq
-% data_string=['Data/'];
-% daq_string=['.daq'];
-% data_n=num2str(loc90,'%i');
-% data_loc = strcat(data_string,data_n,daq_string);
-% 
-% 
-% [daq_90,time,abstime] = daqread(data_loc);
-% 
-% mean_90=mean(daq_90);
-% mean_90=mean(daq_90);
-% histogram(daq_90(:,1))
+%% Qn 7
+
+%find the data point
+[e loc90]=min(abs(vel_ratio-.90));
+
+%read in the daq
+data_string=['Data/'];
+daq_string=['.daq'];
+data_n=num2str(loc90,'%i');
+data_loc = strcat(data_string,data_n,daq_string);
 
 
-% %% Functions
-% 
-% function output = clauser_fn(Cf)
-%               (1/k).*sqrt(Cf/2).*z_plus + ...
-%               (1/k).*sqrt(Cf/2).*log(sqrt(Cf/2)) + ...
-%                    A*sqrt(Cf/2);end
+[daq_90,time,abstime] = daqread(data_loc);
+
+u_90=U_fnof_tnE(1,daq_90(:,1)');
+
+figure;
+n=1:length(u_90)
+plot(u_90)
+xlabel('')
+ylabel('Velocity')
+title('Probability Density Function of Raw Velocity Signal')
+grid on
+figure_format(); 
+
+figure;
+histogram(u_90-mean(u_90),130)
+xlabel('Velocity Fluctuation')
+ylabel('Frequency')
+title('Probability Density Function of Raw Velocity Signal')
+grid on
+figure_format(); 
