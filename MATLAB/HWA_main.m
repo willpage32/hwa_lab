@@ -99,7 +99,7 @@ xlabel('y^{+} = (y u / \nu)') ; ylabel('U+ = u/u_{\infty}')
 A=5;
 k=k;
 
-Cf = 0.000:.001:0.01
+Cf = linspace(0,.005,20)
 
 zplus_lre  = log(z_lre*U_inf_lre/nu_air);
 zplus_hre  = log(z_hre*U_inf_hre/nu_air);
