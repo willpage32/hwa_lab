@@ -257,6 +257,20 @@ title('Outer Scaled Mean Velocity Profile - Low Re')
 grid on
 figure_format(); 
 
+%% Comparison Plot
+
+%Inner
+figure;
+semilogx(exp(zplus_lre+.25),(u_bar_lre)/U_tau_lre);
+xlabel('z^+')
+ylabel('u/U_{\tau}')
+title('Inner Scaled Mean Velocity Profile Comparison')
+grid on
+hold on
+semilogx(exp(zplus_hre),(u_bar_hre)/U_tau_hre,'r');
+legend('Low  Re','High Re')
+figure_format(); 
+
 %%
 % B_hre=7;
 % 
