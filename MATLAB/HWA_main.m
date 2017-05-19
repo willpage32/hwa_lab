@@ -240,7 +240,7 @@ grid on
 figure_format(); 
 
 %%%%%Low Re%%%%%
-%Outer
+%Inner
 figure;
 semilogx(exp(zplus_lre),(u_bar_lre)/U_tau_lre);
 xlabel('z^+')
@@ -248,7 +248,7 @@ ylabel('u/U_{\tau}')
 title('Inner Scaled Mean Velocity Profile - Low Re')
 grid on
 figure_format(); 
-
+%outer
 figure;
 semilogx(z_lre/delta99_lre,(U_inf_lre - u_bar_lre)/U_tau_lre);
 xlabel('z/\delta')
@@ -258,30 +258,30 @@ grid on
 figure_format(); 
 
 %%
-B_hre=7;
-
-LHS_hre_outer = (U_inf_hre - u_bar_hre)/U_tau_hre ;
-RHS_hre_outer = (1/k)*log(z_hre/delta99_hre)+B_hre;
-
-%Inner
-LHS_hre_inner = (u_bar_hre)/U_tau_hre ;
-RHS_hre_inner = (1/k)*log(z_hre*U_tau_hre/nu_air)+A;
-
-figure;
-semilogx(RHS_hre_outer,LHS_hre_outer);
-xlabel('1/\kappa ln(z/\delta) + B')
-ylabel('(U_{\infty}- u)/U_{\tau}')
-title('Outer Scaled')
-grid on
-figure_format(); 
-
-figure;
-semilogx(RHS_hre_inner,LHS_hre_inner);
-xlabel('1/\kappa ln(z U_\tau / \nu) + A')
-ylabel('u/U_{\tau}')
-title('Inner Scaled')
-grid on
-figure_format(); 
+% B_hre=7;
+% 
+% LHS_hre_outer = (U_inf_hre - u_bar_hre)/U_tau_hre ;
+% RHS_hre_outer = (1/k)*log(z_hre/delta99_hre)+B_hre;
+% 
+% %Inner
+% LHS_hre_inner = (u_bar_hre)/U_tau_hre ;
+% RHS_hre_inner = (1/k)*log(z_hre*U_tau_hre/nu_air)+A;
+% 
+% figure;
+% semilogx(RHS_hre_outer,LHS_hre_outer);
+% xlabel('1/\kappa ln(z/\delta) + B')
+% ylabel('(U_{\infty}- u)/U_{\tau}')
+% title('Outer Scaled')
+% grid on
+% figure_format(); 
+% 
+% figure;
+% semilogx(RHS_hre_inner,LHS_hre_inner);
+% xlabel('1/\kappa ln(z U_\tau / \nu) + A')
+% ylabel('u/U_{\tau}')
+% title('Inner Scaled')
+% grid on
+% figure_format(); 
 
 %% Variance
 
@@ -301,25 +301,11 @@ xlabel('z^+')
 ylabel('Variance')
 title('Inner Scaled Turbulance Intensity Profiles')
 grid on
+legend('Low Re','High Re')
 figure_format(); 
-
-
-
-% 
-% figure;
-% subplot(2,1,1)
-% plot(z_lre,u_var_lre)  % what units are zexp and zhre in?
-% ylabel('Variance')
-% subplot(2,1,2)
-% plot(z_hre,u_var_hre)
-% ylabel('Variance')
-% xlabel('z^+')
 
 % 1/20 for low re, 1/40 for high re.
 % 2 methods are eqiuvlant.
-
-
-
 
 
 % %Low Re
@@ -336,34 +322,7 @@ figure_format();
 % grid on
 % figure_format(); 
 
-%%Old clauser stuff
-% 
-% clauser_x2 = exp( (1/k)  .* sqrt(Cf/2).*log(y.*u_inf./nu_air)  + ...
-%         (1/k).*sqrt(Cf/2).*log(sqrt(Cf/2)) + A .* sqrt(Cf/2) );
-% logx_clau2 = log(clauser_x2);
-% hold on ;
-% semilogx(clauser_x2,u_plusA_exp)
-% break
 
-% %% Find the HIGH RE friction velocity
-% % High Reynolds data : [U_hre,Uinf_hre,nu_hre,uvar_hre,x_hre,z_hre] 
-% 
-% U_infplus_hre = U_hre/Uinf_hre      ; % First normalise by U_inftyf
-% % cf_guess_hre = linspace(0.2,.5,5e2) ; % Vector of guesses for Cf
-% cf_guess_hre = 0.4091;
-% 
-% y_plus_theory_hre = exp ((1/k) .* sqrt(cf_guess_hre/2).*log(z_hre.*Uinf_hre/nu_hre)  + ...
-% 	(1/k).*sqrt(cf_guess_hre/2).*log(sqrt(cf_guess_hre/2)) + A * sqrt(cf_guess_hre/2) );
-% 
-% y_plus_hre = (z_hre.*U_hre)/nu_hre;
-% 
-% figure ; semilogx(y_plus_hre,U_infplus_hre) ; title('Experimental U+ , y+');
-% xlabel('y+'); ylabel('U+');
-% 
-% figure ; semilogx(y_plus_theory_hre,U_infplus_hre,'-o') ; hold on ;
-% semilogx(y_plus_hre,U_infplus_hre);
-% title('Comparition of U+/y+ for varying cf to find U_{tau}');
-% xlabel('y+'); ylabel('U+');
 % 
 % % 0.55 and 0.7 seem good U+ to seartch for linear regions
 % 
