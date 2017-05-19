@@ -58,7 +58,7 @@ title('Time linear interpolated U vs E correltation surface inputs')
 % title('Time linear interpolated U vs E correltation surface')
 
 %% Load in the high reynolds data
-[u_bar_hre,U_inf_hre,nu_hre,uvar_hre,x_hre,z_hre] = read_highRe();
+[u_bar_hre,U_inf_hre,nu_hre,u_var_hre,x_hre,z_hre] = read_highRe();
 
 % utau should be around 30 - n.hutch 445 
 % upper limit at 15% of the layer thickness 
@@ -220,7 +220,7 @@ Re_tau_hre= delta99_hre*U_tau_hre/nu_air;
 %% Inner scaled/outer scaled velocity
 
 %%%%%High Re%%%%%
-%Outer
+%inner
 close all
 figure;
 semilogx(exp(zplus_hre),(u_bar_hre)/U_tau_hre,'r');
@@ -230,6 +230,7 @@ title('Inner Scaled Mean Velocity Profile - High Re')
 grid on
 figure_format(); 
 
+%outer
 figure;
 semilogx(z_hre/delta99_hre,(U_inf_hre - u_bar_hre)/U_tau_hre,'r');
 xlabel('z/\delta')
@@ -256,9 +257,7 @@ title('Outer Scaled Mean Velocity Profile - Low Re')
 grid on
 figure_format(); 
 
-
 %%
-
 B_hre=7;
 
 LHS_hre_outer = (U_inf_hre - u_bar_hre)/U_tau_hre ;
@@ -283,6 +282,43 @@ ylabel('u/U_{\tau}')
 title('Inner Scaled')
 grid on
 figure_format(); 
+
+%% Variance
+
+
+%load('times.mat')
+load('volts.mat')
+
+voltage_variance=var(volt_full);
+u_var_lre = U_fnof_tnE((1:tf).',voltage_variance') ;
+
+%%  Plot Variance QN3/4
+figure; 
+semilogx(exp(zplus_lre),u_var_lre,'o-')  % what units are zexp and zhre in?
+hold on
+semilogx(exp(zplus_hre),u_var_hre,'r-p')
+xlabel('z^+')
+ylabel('Variance')
+title('Inner Scaled Turbulance Intensity Profiles')
+grid on
+figure_format(); 
+
+
+
+% 
+% figure;
+% subplot(2,1,1)
+% plot(z_lre,u_var_lre)  % what units are zexp and zhre in?
+% ylabel('Variance')
+% subplot(2,1,2)
+% plot(z_hre,u_var_hre)
+% ylabel('Variance')
+% xlabel('z^+')
+
+% 1/20 for low re, 1/40 for high re.
+% 2 methods are eqiuvlant.
+
+
 
 
 
