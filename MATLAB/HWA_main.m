@@ -98,7 +98,7 @@ title('Clauser Chart - Experimental data only ') ;
 xlabel('y^{+} = (y u / \nu)') ; ylabel('U+ = u/u_{\infty}')
 
 Cf = linspace(0,.5,5e2) ; %.4545  ; %.4549 %
-clauser_x2 = exp( (1/k) .* sqrt(Cf/2).*log(y.*u_inf./nu_air)  + ...
+clauser_x2 = exp( (1/k)  .* sqrt(Cf/2).*log(y.*u_inf./nu_air)  + ...
         (1/k).*sqrt(Cf/2).*log(sqrt(Cf/2)) + A .* sqrt(Cf/2) );
 logx_clau2 = log(clauser_x2);
 hold on ;
@@ -106,56 +106,74 @@ semilogx(clauser_x2,u_plusA_exp)
 
 %% Find the HIGH RE friction velocity
 % [U_hre,Uinf_hre,nu_hre,uvar_hre,x_hre,z_hre] 
+clc;
+close all;
 
 U_plus_hre = U_hre/Uinf_hre;
 
-cf_guess_hre = linspace(0,1,2e1);
+% cf_found = 0.4091
+cf_guess_hre = linspace(0.2,.5,5e2) ; % Vector of guesses for Cf
+% cf_guess_hre = 0.4091;
 
 y_plus_theory_hre = exp ((1/k) .* sqrt(cf_guess_hre/2).*log(z_hre.*Uinf_hre/nu_hre)  + ...
 	(1/k).*sqrt(cf_guess_hre/2).*log(sqrt(cf_guess_hre/2)) + A * sqrt(cf_guess_hre/2) );
 
 y_plus_hre = (z_hre.*U_hre)/nu_hre;
 
-figure ; semilogx(y_plus_hre,U_plus_hre)
-size(y_plus_theory_hre)
+figure ; semilogx(y_plus_hre,U_plus_hre) ; title('Experimental U+ , y+');
+xlabel('y+'); ylabel('U+');
 
-figure ; semilogx(y_plus_theory_hre,U_plus_hre,'-o')
-hold on ;
-semilogx(y_plus_hre,U_plus_hre)
-
-% x = 3.3e4 ; y = 0.774 lin end point
-% x = 2.5e3 ; y = 0.557 lin st point
-
-[mr_yplus_s, idx_yplus_st ] = min(abs(U_plus_hre-0.55));
-[mr_yplus_e, idx_yplus_end] = min(abs(U_plus_hre-0.7 ));
-
-plot(y_plus_hre(idx_yplus_st),U_plus_hre(idx_yplus_st),'k*','markerSize',10)
-plot(y_plus_hre(idx_yplus_end),U_plus_hre(idx_yplus_end),'k*','markerSize',10)
-
-grad_hre_exp = (U_plus_hre(idx_yplus_st) - U_plus_hre(idx_yplus_end)) / ...
-    (y_plus_hre(idx_yplus_st) - y_plus_hre(idx_yplus_end))
+figure ; semilogx(y_plus_theory_hre,U_plus_hre,'-o') ; hold on ;
+semilogx(y_plus_hre,U_plus_hre);
+title('Comparition of U+/y+ for varying cf to find U_{tau}');
+xlabel('y+'); ylabel('U+');
 
 % 0.55 and 0.7 seem good U+ to seartch for linear regions
+
+[mr_yplus_s, idx_yplus_st ] = min(abs(U_plus_hre-0.55))
+[mr_yplus_e, idx_yplus_end] = min(abs(U_plus_hre-0.7 ))
+
+% Plot gradient evaluation points of experimental data on graph
+plot(y_plus_hre(idx_yplus_st) ,U_plus_hre(idx_yplus_st) ,'k*','markerSize',10)
+plot(y_plus_hre(idx_yplus_end),U_plus_hre(idx_yplus_end),'k*','markerSize',10)
+
+% Gradient of experimental log region of velocity profile
+grad_hre_exp = (U_plus_hre(idx_yplus_st) - U_plus_hre(idx_yplus_end)) / ...
+    (log(y_plus_hre(idx_yplus_st)) - log(y_plus_hre(idx_yplus_end)))
+
+% Find indicies of the start and end points of the linear region
 [mr_yplus_th_s, idx_yplus_th_st ] = min(abs(U_plus_hre-0.55));
 [mr_yplus_th_e, idx_yplus_th_end] = min(abs(U_plus_hre-0.7));
 
+% Plot gradient evaluation points of all theory points on graph
 plot(y_plus_theory_hre(idx_yplus_st,:) ,U_plus_hre(idx_yplus_st,:) ,'k*','markerSize',10)
 plot(y_plus_theory_hre(idx_yplus_end,:),U_plus_hre(idx_yplus_end,:),'k*','markerSize',10)
 
+% Evaluate all theoretical velcoity gradients 
 theory_hre_gradients = (U_plus_hre(idx_yplus_th_end) - U_plus_hre(idx_yplus_th_st) ) ./ ...
-    ( y_plus_theory_hre(idx_yplus_th_end,:) - y_plus_theory_hre(idx_yplus_th_st,:));
+    ( log(y_plus_theory_hre(idx_yplus_th_end,:)) - log(y_plus_theory_hre(idx_yplus_th_st,:)));
 
-figure ; plot(grad_hre_exp-theory_hre_gradients)
+grad_diff_hre = grad_hre_exp-theory_hre_gradients;
+[mr_grad, idx_best_grad] = min(abs(grad_diff_hre));
+cf_found = cf_guess_hre(idx_best_grad);
 
-[mr_grad idx_best_grad] = min(abs(grad_hre_exp-theory_hre_gradients));
-
-cf_found = cf_guess_hre(idx_best_grad)
+% Plot the residual function for gradient difference
+figure ; plot(cf_guess_hre,-grad_hre_exp+theory_hre_gradients) ; hold on;
+title('Gradient difference - Residual plot');
+xlabel('Skin Friction - C_{f}') ; ylabel('Grandient difference function')
+y_dash_range = linspace(0.2,cf_found,2e2) ; y_dash_rangeB = zeros(size(y_dash_range));
+x_dash_range = linspace(-.01,0,2e2) ; x_dash_rangeB = cf_found*ones(size(x_dash_range));
+plot(y_dash_range,y_dash_rangeB,'--','ctolor',[.7,.7,.7]) ;
+plot(x_dash_rangeB,x_dash_range,'--','color',[.7,.7,.7]) ;
+plot(cf_guess_hre(idx_best_grad),grad_diff_hre(idx_best_grad),'-p',...
+    'MarkerFaceColor',[255 105 180]./256,'MarkerSize',35);
 
 y_plus_hre_theoryadj = exp( (1/k) .* sqrt(cf_found/2).*log(z_hre.*Uinf_hre/nu_hre)  + ...
 	(1/k).*sqrt(cf_found/2).*log(sqrt(cf_found/2)) + A * sqrt(cf_found/2) );
 
 figure ; semilogx(y_plus_hre_theoryadj,U_plus_hre) ; hold on ;
-semilogx(y_plus_hre,U_plus_hre)
+semilogx(y_plus_hre,U_plus_hre) ;
+title('Re-plot the experimental data with clauser theory');
 
 %% find the gradients of clauser and experimental, find Cf
 
