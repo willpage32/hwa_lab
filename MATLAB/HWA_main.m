@@ -231,8 +231,8 @@ grid on
 figure_format(); 
 
 figure;
-semilogx(exp(zplus_hre),(U_inf_hre - u_bar_hre)/U_tau_hre,'r');
-xlabel('z^+')
+semilogx(z_hre/delta99_hre,(U_inf_hre - u_bar_hre)/U_tau_hre,'r');
+xlabel('z/\delta')
 ylabel('(U_{\infty}- u)/U_{\tau}')
 title('Outer Scaled Mean Velocity Profile - High Re')
 grid on
@@ -249,8 +249,8 @@ grid on
 figure_format(); 
 
 figure;
-semilogx(exp(zplus_lre),(U_inf_lre - u_bar_lre)/U_tau_lre);
-xlabel('z^+')
+semilogx(z_lre/delta99_lre,(U_inf_lre - u_bar_lre)/U_tau_lre);
+xlabel('z/\delta')
 ylabel('(U_{\infty}- u)/U_{\tau}')
 title('Outer Scaled Mean Velocity Profile - Low Re')
 grid on
