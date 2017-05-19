@@ -62,7 +62,7 @@ title('Time linear interpolated U vs E correltation surface inputs')
 % title('Time linear interpolated U vs E correltation surface')
 
 %% Load in the high reynolds data
-[u_bar_hre,U_inf_hre,nu_hre,uvar_hre,x_hre,z_hre] = read_highRe();
+[u_bar_hre,U_inf_hre,nu_hre,u_var_hre,x_hre,z_hre] = read_highRe();
 
 % utau should be around 30 - n.hutch 445 
 % upper limit at 15% of the layer thickness 
@@ -157,35 +157,176 @@ title('Comparison of Velocity Profiles (High/Low Re)')
 grid on
 figure_format(); 
 
+%% Qn6.7a, determine \delta_{99}, \delta*, \theta , H , Cf
+%Determine for low Re (experimental data)
 
-%%Old clauser stuff
-% 
-% clauser_x2 = exp( (1/k)  .* sqrt(Cf/2).*log(y.*u_inf./nu_air)  + ...
-%         (1/k).*sqrt(Cf/2).*log(sqrt(Cf/2)) + A .* sqrt(Cf/2) );
-% logx_clau2 = log(clauser_x2);
-% hold on ;
-% semilogx(clauser_x2,u_plusA_exp)
-% break
+%Delta 99 - Bpoundary Layer thickness
+vel_ratio=u_bar_lre./U_inf_lre;
+[e loc99]=min(abs(vel_ratio-.99));
+delta99_lre=z_lre(loc99)
 
-% %% Find the HIGH RE friction velocity
-% % High Reynolds data : [U_hre,Uinf_hre,nu_hre,uvar_hre,x_hre,z_hre] 
+%show the velocity on a plot
+figure; hold on; xlabel('Distance from Wall [m]');ylabel('Velocity')
+plot(z_lre,u_bar_lre); plot(delta99_lre,u_bar_lre(loc99),'r*')
+legend('Hotwire Velocity','99% U_0'); 
+
+%Delta* - Displacement Thickness
+%uses trapz to integrate w.r.t y
+T1_lre=(1-u_bar_lre./U_inf_lre);
+delta_star=trapz(z_lre,T1_lre);
+
+%\Theta - Momentum thickness
+T2_lre=(u_bar_lre./U_inf_lre).*(1-u_bar_lre./U_inf_lre);
+Theta=trapz(z_lre,T2_lre);
+
+%H - Shape factor
+%The higher the value of H, the stronger the adverse pressure gradient. 
+%A high adverse pressure gradient can greatly reduce the Reynolds number at 
+%which transition into turbulence may occur.
+H=delta_star/Theta;
+
+Re_tau_lre= delta99_lre*U_tau_lre/nu_air;
+
+
+%% Qn6.7b, determine for high Re data 
+%[U_hre,Uinf_hre,nu_hre,uvar_hre,x_hre,z_hre] = read_highRe();
+nu_air./U_tau_hre;
+
+%Delta 99 - Bpoundary Layer thickness
+vel_ratio_hre=u_bar_hre./U_inf_hre;
+[e_hre loc99_hre]=min(abs(vel_ratio_hre-.99));
+delta99_hre=z_hre(loc99_hre)
+
+%show the velocity on a plot
+figure; hold on; xlabel('Distance from Wall [m]');ylabel('Velocity')
+plot(z_hre,u_bar_hre); plot(delta99_hre,u_bar_hre(loc99_hre),'r*')
+legend('Hotwire Velocity High Re','99% U_0'); 
+
+%Delta* - Displacement Thickness
+%uses trapz to integrate w.r.t y
+T1_hre=(1-u_bar_hre./U_inf_hre);
+delta_star_hre=trapz(z_hre,T1_hre);
+
+%\Theta - Momentum thickness
+T2_hre=(u_bar_hre./U_inf_hre).*(1-u_bar_hre./U_inf_hre);
+Theta_hre=trapz(z_hre,T2_hre);
+
+%H - Shape factor
+%The higher the value of H, the stronger the adverse pressure gradient. 
+%A high adverse pressure gradient can greatly reduce the Reynolds number at 
+%which transition into turbulence may occur.
+H=delta_star_hre/Theta_hre;
+
+
+Re_tau_hre= delta99_hre*U_tau_hre/nu_air;
+
+
+%% Inner scaled/outer scaled velocity
+
+%%%%%High Re%%%%%
+%inner
+close all
+figure;
+semilogx(exp(zplus_hre),(u_bar_hre)/U_tau_hre,'r');
+xlabel('z^+')
+ylabel('u/U_{\tau}')
+title('Inner Scaled Mean Velocity Profile - High Re')
+grid on
+figure_format(); 
+
+%outer
+figure;
+semilogx(z_hre/delta99_hre,(U_inf_hre - u_bar_hre)/U_tau_hre,'r');
+xlabel('z/\delta')
+ylabel('(U_{\infty}- u)/U_{\tau}')
+title('Outer Scaled Mean Velocity Profile - High Re')
+grid on
+figure_format(); 
+
+%%%%%Low Re%%%%%
+%Inner
+figure;
+semilogx(exp(zplus_lre),(u_bar_lre)/U_tau_lre);
+xlabel('z^+')
+ylabel('u/U_{\tau}')
+title('Inner Scaled Mean Velocity Profile - Low Re')
+grid on
+figure_format(); 
+%outer
+figure;
+semilogx(z_lre/delta99_lre,(U_inf_lre - u_bar_lre)/U_tau_lre);
+xlabel('z/\delta')
+ylabel('(U_{\infty}- u)/U_{\tau}')
+title('Outer Scaled Mean Velocity Profile - Low Re')
+grid on
+figure_format(); 
+
+%%
+% B_hre=7;
 % 
-% U_infplus_hre = U_hre/Uinf_hre      ; % First normalise by U_inftyf
-% % cf_guess_hre = linspace(0.2,.5,5e2) ; % Vector of guesses for Cf
-% cf_guess_hre = 0.4091;
+% LHS_hre_outer = (U_inf_hre - u_bar_hre)/U_tau_hre ;
+% RHS_hre_outer = (1/k)*log(z_hre/delta99_hre)+B_hre;
 % 
-% y_plus_theory_hre = exp ((1/k) .* sqrt(cf_guess_hre/2).*log(z_hre.*Uinf_hre/nu_hre)  + ...
-% 	(1/k).*sqrt(cf_guess_hre/2).*log(sqrt(cf_guess_hre/2)) + A * sqrt(cf_guess_hre/2) );
+% %Inner
+% LHS_hre_inner = (u_bar_hre)/U_tau_hre ;
+% RHS_hre_inner = (1/k)*log(z_hre*U_tau_hre/nu_air)+A;
 % 
-% y_plus_hre = (z_hre.*U_hre)/nu_hre;
+% figure;
+% semilogx(RHS_hre_outer,LHS_hre_outer);
+% xlabel('1/\kappa ln(z/\delta) + B')
+% ylabel('(U_{\infty}- u)/U_{\tau}')
+% title('Outer Scaled')
+% grid on
+% figure_format(); 
 % 
-% figure ; semilogx(y_plus_hre,U_infplus_hre) ; title('Experimental U+ , y+');
-% xlabel('y+'); ylabel('U+');
+% figure;
+% semilogx(RHS_hre_inner,LHS_hre_inner);
+% xlabel('1/\kappa ln(z U_\tau / \nu) + A')
+% ylabel('u/U_{\tau}')
+% title('Inner Scaled')
+% grid on
+% figure_format(); 
+
+%% Variance
+
+
+%load('times.mat')
+load('volts.mat')
+
+voltage_variance=var(volt_full);
+u_var_lre = U_fnof_tnE((1:tf).',voltage_variance') ;
+
+%%  Plot Variance QN3/4
+figure; 
+semilogx(exp(zplus_lre),u_var_lre,'o-')  % what units are zexp and zhre in?
+hold on
+semilogx(exp(zplus_hre),u_var_hre,'r-p')
+xlabel('z^+')
+ylabel('Variance')
+title('Inner Scaled Turbulance Intensity Profiles')
+grid on
+legend('Low Re','High Re')
+figure_format(); 
+
+% 1/20 for low re, 1/40 for high re.
+% 2 methods are eqiuvlant.
+
+
+% %Low Re
+% B_lre=7;
 % 
-% figure ; semilogx(y_plus_theory_hre,U_infplus_hre,'-o') ; hold on ;
-% semilogx(y_plus_hre,U_infplus_hre);
-% title('Comparition of U+/y+ for varying cf to find U_{tau}');
-% xlabel('y+'); ylabel('U+');
+% LHS_lre_outer = (U_inf_lre - u_bar_lre)/U_tau_lre ;
+% RHS_lre_outer = (1/k)*log(z_lre/delta99_lre)+B_lre;
+% 
+% figure;
+% semilogx(RHS_lre_outer,LHS_lre_outer);
+% xlabel('1/\kappa ln(z/\delta) + B')
+% ylabel('(U_{\infty}- u)/U_{\tau}')
+% title('Outer Scaled')
+% grid on
+% figure_format(); 
+
+
 % 
 % % 0.55 and 0.7 seem good U+ to seartch for linear regions
 % 
@@ -394,70 +535,6 @@ figure_format();
 % % [acor,lag] =xcorr(clauser_true,log(clauser_x));
 % % [acor,lag']
 % 
-% %% Qn6.7a, determine \delta_{99}, \delta*, \theta , H , Cf
-% %Determine for low Re (experimental data)
-% 
-% %Delta 99 - Bpoundary Layer thickness
-% vel_ratio=u_hotwire./u_inf_lre;
-% [e loc99]=min(abs(vel_ratio-.99));
-% delta99=z_lre(loc99)
-% 
-% %show the velocity on a plot
-% figure; hold on; xlabel('Distance from Wall [m]');ylabel('Velocity')
-% plot(z_lre,u_hotwire); plot(delta99,u_hotwire(loc99),'r*')
-% legend('Hotwire Velocity','99% U_0'); 
-% 
-% %Delta* - Displacement Thickness
-% %uses trapz to integrate w.r.t y
-% T1=(1-u_hotwire./u_inf_lre);
-% delta_star=trapz(z_lre,T1);
-% 
-% %\Theta - Momentum thickness
-% T2=(u_hotwire./u_inf_lre).*(1-u_hotwire./u_inf_lre);
-% Theta=trapz(z_lre,T2);
-% 
-% %H - Shape factor
-% %The higher the value of H, the stronger the adverse pressure gradient. 
-% %A high adverse pressure gradient can greatly reduce the Reynolds number at 
-% %which transition into turbulence may occur.
-% H=delta_star/Theta;
-% 
-% %Skin Friction Coefficient
-% Cf_true;
-% 
-% %% Qn6.7b, determine for high Re data 
-% %[U_hre,Uinf_hre,nu_hre,uvar_hre,x_hre,z_hre] = read_highRe();
-% nu_air./U_tau
-% 
-% %Delta 99 - Bpoundary Layer thickness
-% vel_ratio_hre=U_hre./Uinf_hre;
-% [e_hre loc99_hre]=min(abs(vel_ratio_hre-.99));
-% delta99_hre=z_hre(loc99_hre)
-% 
-% %show the velocity on a plot
-% figure; hold on; xlabel('Distance from Wall [m]');ylabel('Velocity')
-% plot(z_hre,U_hre); plot(delta99_hre,U_hre(loc99_hre),'r*')
-% legend('Hotwire Velocity High Re','99% U_0'); 
-% 
-% %Delta* - Displacement Thickness
-% %uses trapz to integrate w.r.t y
-% T1_hre=(1-U_hre./Uinf_hre);
-% delta_star_hre=trapz(z_hre,T1_hre);
-% 
-% %\Theta - Momentum thickness
-% T2_hre=(U_hre./Uinf_hre).*(1-U_hre./Uinf_hre);
-% Theta_hre=trapz(z_hre,T2_hre);
-% 
-% %H - Shape factor
-% %The higher the value of H, the stronger the adverse pressure gradient. 
-% %A high adverse pressure gradient can greatly reduce the Reynolds number at 
-% %which transition into turbulence may occur.
-% H=delta_star_hre/Theta_hre;
-% 
-% %Skin Friction Coefficient
-% Cf_true;
-% 
-% retau= delta99_hre*U_tau/nu_air
 % 
 % %% Qn 7
 % 
