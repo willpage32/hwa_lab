@@ -25,7 +25,7 @@ path_post = 'Data/post' ; % Post-calibration path
 % Velocity fucntions describing some new 'u'
 V_pr = linspace(min(u_pre) ,max(u_pre) ,1e2).' ; 
 V_po = linspace(min(u_post),max(u_post),1e2).' ; 
-
+t
 u_pr = u_prfit(V_pr) ; u_po = u_pofit(V_po)  ;  
 
 fitfns = figure ; figure_format() ;
@@ -79,12 +79,11 @@ nu_air  = C1*(T^(1.5))/(rho*(T+110.5))  %
 close all
 
 y = (z_exp./1000) ; % Distance from wall (m) (assumed measured in mm) 
-
+u_inf     = u_exp ;
 u_hotwire = U_fnof_tnE((1:tf).',v_exp) ; % Corrleate voltage anemometor reading with velocity
 
 y_plus_exp = (y.*u_hotwire)./(nu_air)   ; % EXPERIMENT Clauser x input
-% scale by u_tau not u infinity 
-% u+ should come to around ...
+% scale by u_tau not u infinity, u+ should come to around ...
 u_plusA_exp = u_hotwire./u_inf           ; % EXPERIMENT Clauser y input
 
 logx_clau = log(y_plus_exp);
@@ -108,8 +107,8 @@ semilogx(clauser_x2,u_plusA_exp)
 % High Reynolds data : [U_hre,Uinf_hre,nu_hre,uvar_hre,x_hre,z_hre] 
 
 U_infplus_hre = U_hre/Uinf_hre      ; % First normalise by U_inftyf
-cf_guess_hre = linspace(0.2,.5,5e2) ; % Vector of guesses for Cf
-% cf_guess_hre = 0.4091;
+% cf_guess_hre = linspace(0.2,.5,5e2) ; % Vector of guesses for Cf
+cf_guess_hre = 0.4091;
 
 y_plus_theory_hre = exp ((1/k) .* sqrt(cf_guess_hre/2).*log(z_hre.*Uinf_hre/nu_hre)  + ...
 	(1/k).*sqrt(cf_guess_hre/2).*log(sqrt(cf_guess_hre/2)) + A * sqrt(cf_guess_hre/2) );
@@ -174,7 +173,7 @@ semilogx(y_plus_hre,U_infplus_hre) ;
 title('Re-plot the experimental data with clauser theory, check gradients visually');
 
 % Find Utau and re-normalise it
-rho_hre = rho ; % Make the assumption both experiments are in air
+rho_hre   = rho ; % Make the assumption both experiments are in air
 tau_w_hre = cf_found .*(1/2).*rho_hre.*(Uinf_hre.^2) ;  %[Pa]  or  N/m^2 
 U_tau_hre = sqrt(tau_w_hre./rho_hre) ;                  %[Pa]/[kg/m^3] = [m/s]
 Uplus_hre = U_hre/U_tau_hre ; % NORMALISE BY Utau
@@ -224,9 +223,11 @@ ylabel('Difference (unitless)')
 
 %% Caluclate Tau and U_tau
 % once Cf is found out, we can calculate tau_w and then U_tau
-tau_w = Cf_true .*(1/2).*rho.*(u_inf.^2) ;  %[Pa]  or  N/m^2 
-U_tau = sqrt(tau_w./rho) ;                  %[Pa]/[kg/m^3] = [m/s]
-y_exp_u_tau=u_hotwire/U_tau;
+tau_w = Cf_true .*(1/2).*rho.*(u_inf.^2) ;  % [Pa]  or  N/m^2 
+U_tau = mean(sqrt(tau_w./rho)) ;                  % [Pa]/[kg/m^3] = [m/s]
+U_exp_u_tau = u_hotwire/U_tau ;             % 
+
+figure ; semilogx(y_plus_exp,U_exp_u_tau) ;
 %% Define true Clauser plot
 
 clauser_true =(1/k) * sqrt(Cf_true/2).*log(y.*u_inf/nu_air)  + ...
