@@ -58,7 +58,7 @@ title('Time linear interpolated U vs E correltation surface inputs')
 % title('Time linear interpolated U vs E correltation surface')
 
 %% Load in the high reynolds data
-[U_hre,Uinf_hre,nu_hre,uvar_hre,x_hre,z_hre] = read_highRe();
+[u_bar_hre,U_inf_hre,nu_hre,uvar_hre,x_hre,z_hre] = read_highRe();
 
 % utau should be around 30 - n.hutch 445 
 % upper limit at 15% of the layer thickness 
@@ -79,16 +79,16 @@ nu_air  = C1*(T^(1.5))/(rho*(T+110.5))  %
 close all
 
 z_lre = (z_exp./1000) ; % Distance from wall (m) (assumed measured in mm) 
-u_inf_lre = mean(u_exp) ;   %u_inf 
-u_hotwire = U_fnof_tnE((1:tf).',v_exp) ; % Corrleate voltage anemometor reading with velocity
+U_inf_lre = mean(u_exp) ;   %u_inf 
+u_bar_lre = U_fnof_tnE((1:tf).',v_exp) ; % Corrleate voltage anemometor reading with velocity
 
-y_plus_exp = (z_lre.*u_hotwire)./(nu_air)   ; % EXPERIMENT Clauser x input
+y_plus_exp = (z_lre.*u_bar_lre)./(nu_air)   ; % EXPERIMENT Clauser x input
 % scale by u_tau not u infinity, u+ should come to around ...
-u_plusA_exp = u_hotwire./u_inf_lre          ; % EXPERIMENT Clauser y input
+u_plusA_exp = u_bar_lre./U_inf_lre          ; % EXPERIMENT Clauser y input
 
 figure ; semilogx(y_plus_exp , u_plusA_exp,'lineWidth',2) ;  hold on
 % HIGH re
-semilogx ((z_hre.*U_hre)/nu_hre ,  U_hre./Uinf_hre)
+semilogx ((z_hre.*u_bar_hre)/nu_hre ,  u_bar_hre./U_inf_hre)
 
 % figure_format(); axis([1.5e2,3e4,.4,1.01]) ;
 title('Clauser Chart - Experimental data only ') ;
@@ -96,21 +96,63 @@ xlabel('y^{+} = (y u / \nu)') ; ylabel('U+ = u/u_{\infty}')
 
 %% Guess U_tau
 
-Cf = 0.004
+A=5;
+k=k;
 
-zplus_lre  = log(z_lre*u_inf_lre/nu_air);
-clauser_fn = @(Cf,zplus_lre) ...
-              (1/k).*sqrt(Cf/2).*z_plus + ...
+Cf = linspace(0.0015,.0029,20)
+
+zplus_lre  = log(z_lre*U_inf_lre/nu_air);
+zplus_hre  = log(z_hre*U_inf_hre/nu_air);
+
+clauser_fn = @(Cf,zplus)   (1/k).*sqrt(Cf/2).*zplus + ...
               (1/k).*sqrt(Cf/2).*log(sqrt(Cf/2)) + ...
                    A*sqrt(Cf/2);
-
 figure ; hold on ;
 
 % size(u_hotwire/u_inf_lre)
 % size(zplus_lre)
 % size(clauser_fn(cf,zplus_lre))
-plot(zplus_lre,u_hotwire/u_inf_lre);
-plot(zplus_lre,clauser_fn(Cf,zplus_lre))
+plot(zplus_lre,u_bar_lre/U_inf_lre);
+plot(zplus_lre,clauser_fn(Cf,zplus_lre),'--','color',[.7,.7,.7])
+xlabel('z^+ for Low Reynold`s Number')
+ylabel('u/U_{\infty}')
+title('Clauser Chart for Low Reynold`s Number')
+figure_format(); 
+
+
+figure; hold on
+plot(zplus_hre,u_bar_hre/U_inf_hre);
+plot(zplus_hre,clauser_fn(Cf,zplus_hre),'--','color',[.7,.7,.7])
+xlabel('z^+ for High Reynold`s Number')
+ylabel('u/U_{\infty}')
+title('Clauser Chart for High Reynold`s Number')
+figure_format(); 
+
+%% plot data now with U_tau
+
+
+%% Caluclate Tau and U_tau
+% once Cf is found out, we can calculate tau_w and then U_tau
+Cf_lre=0.0039;
+Cf_hre=0.0020;
+
+tau_w_lre = Cf_lre .*(1/2).*rho.*(U_inf_lre.^2) ;  % [Pa]  or  N/m^2 
+tau_w_hre = Cf_hre .*(1/2).*rho.*(U_inf_hre.^2) ;  % [Pa]  or  N/m^2 
+
+U_tau_lre = sqrt(tau_w_lre./rho) ;                  % [Pa]/[kg/m^3] = [m/s]
+U_tau_hre = sqrt(tau_w_hre./rho) ;                  % [Pa]/[kg/m^3] = [m/s]
+
+figure;
+semilogx(exp(zplus_lre),u_bar_lre./U_tau_lre);
+hold on;
+
+semilogx(exp(zplus_hre),u_bar_hre./U_tau_hre,'color', '[255 105 180]./256')
+xlabel('z^+')
+ylabel('u/U_{\tau}')
+title('Comparison of Velocity Profiles (High/Low Re)')
+grid on
+figure_format(); 
+
 
 %%Old clauser stuff
 % 
@@ -430,3 +472,11 @@ plot(zplus_lre,clauser_fn(Cf,zplus_lre))
 % mean_90=mean(daq_90);
 % mean_90=mean(daq_90);
 % histogram(daq_90(:,1))
+
+
+% %% Functions
+% 
+% function output = clauser_fn(Cf)
+%               (1/k).*sqrt(Cf/2).*z_plus + ...
+%               (1/k).*sqrt(Cf/2).*log(sqrt(Cf/2)) + ...
+%                    A*sqrt(Cf/2);end

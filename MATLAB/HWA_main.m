@@ -128,6 +128,31 @@ ylabel('u/U_{\infty}')
 title('Clauser Chart for High Reynold`s Number')
 figure_format(); 
 
+%% plot data now with U_tau
+
+
+%% Caluclate Tau and U_tau
+% once Cf is found out, we can calculate tau_w and then U_tau
+Cf_lre=0.0039;
+Cf_hre=0.0020;
+
+tau_w_lre = Cf_lre .*(1/2).*rho.*(U_inf_lre.^2) ;  % [Pa]  or  N/m^2 
+tau_w_hre = Cf_hre .*(1/2).*rho.*(U_inf_hre.^2) ;  % [Pa]  or  N/m^2 
+
+U_tau_lre = sqrt(tau_w_lre./rho) ;                  % [Pa]/[kg/m^3] = [m/s]
+U_tau_hre = sqrt(tau_w_hre./rho) ;                  % [Pa]/[kg/m^3] = [m/s]
+
+figure;
+semilogx(exp(zplus_lre),u_bar_lre./U_tau_lre);
+hold on;
+
+semilogx(exp(zplus_hre),u_bar_hre./U_tau_hre);
+xlabel('z^+')
+ylabel('u/U_{\tau}')
+title('Comparison of Velocity Profiles (High/Low Re)')
+grid on
+figure_format(); 
+
 
 %%Old clauser stuff
 % 
