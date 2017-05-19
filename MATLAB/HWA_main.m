@@ -22,11 +22,15 @@ path_post = 'Data/post' ; % Post-calibration path
 [u_prfit, Gpr] = fit(xd1, yd1, fittype('poly3')) ; % Create the  pre-fit
 [u_pofit, Gpo] = fit(xd2, yd2, fittype('poly3')) ; % Create the post-fit
 
+%% KINGS LAW FIT
+
 % Velocity fucntions describing some new 'u'
 V_pr = linspace(min(u_pre) ,max(u_pre) ,1e2).' ; 
 V_po = linspace(min(u_post),max(u_post),1e2).' ; 
 
 u_pr = u_prfit(V_pr) ; u_po = u_pofit(V_po)  ;  
+
+createFit_KINGS(V_pr, u_pr)
 
 fitfns = figure ; figure_format() ;
 hold on ; plot(u_pr,V_pr) ; plot(u_po,V_po) ;

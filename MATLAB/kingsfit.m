@@ -1,10 +1,9 @@
 % Define pre and post fits
 % Make a fit, fitType == 1 for kings law , == 2 for 3rd order poly
-close all
-fitType = 2     ; % 1 = Kings Law ; 2 = 3rd Order poly fit
+clc ; close all  ;
 
 %  Make a kings law / polyn fit 
-V_pr_fit = HWA_Calib_fitter(u_pre ,V_pre , fitType) ;
+V_pr_fit = (u_pre ,V_pre , fitType) ;
 V_po_fit = HWA_Calib_fitter(u_post,V_post, fitType) ;
 
 u_pr_fitdat = linspace(min(u_pre) , max(u_pre) , 1e2) ;
